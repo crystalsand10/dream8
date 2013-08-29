@@ -1,0 +1,32 @@
+2013, August 6 
+
+Downloaded data into the \data folder. 
+
+1. Read the midas paper. 
+2. Understand the data given and what the compitition requires. 
+3. Get the matlab tool boxes. 
+
+--------------------------
+2013, August 22 
+
+(after conversation with Mike yesterday). 
+
+Phospho-level predictions 
+	* could have some kind of constraints, such as an ordering (causation). 
+	* Neural network type reconstruction 
+
+
+		Some considerations: 
+			* definition of error 
+			* how many hidden layers etc. 
+
+
+Intersect also lies in Baysian network type inference(/prediction) methods. 
+
+The paper making inference using boolean networks, makes heavy use of standard deviation of measurement error (they were given measurement error). If we are not given any, can we just run the same algorithm but without error estimates?
+--------------------------
+2013, August 23 
+
+Start by building a very simple neural network perhaps in weka. 
+
+Modeling for prediction. 

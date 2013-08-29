@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<!-- $Revision: 1.1.6.1 $ $Date: 2004/04/20 22:13:25 $ -->
+
+<toc version="1.0">
+<tocitem target="SBDataPipe.html" image="$toolbox/matlab/icons/book_mat.gif">SBDataPipe Toolbox
+	<tocitem image="$toolbox/matlab/icons/pagesicon.gif" target="Introduction.html">Introduction
+	</tocitem>
+	<tocitem image="$toolbox/matlab/icons/pagesicon.gif" target="Data_import.html">Data import, storage, and handling in Matlab
+		<tocitem target="Importing_Data.html">Importing Data
+		</tocitem>
+		<tocitem target="Compendium.html">The Compendium
+		</tocitem>
+		<tocitem target="Cubes.html">The Cubes
+		</tocitem>
+		<tocitem target="Labels.html">The Labels
+		</tocitem>
+	</tocitem>
+	<tocitem image="$toolbox/matlab/icons/pagesicon.gif" target="User_Interfaces.html">User Interfaces
+	</tocitem>
+	<tocitem image="$toolbox/matlab/icons/pagesicon.gif" target="MATLAB_functions.html">MATLAB functions
+		<tocitem target="Importing_Data.html">Importing Data
+		</tocitem>
+		<tocitem target="Processing_Functions.html">Processing Functions
+		</tocitem>
+		<tocitem target="Plotting_functions.html">Plotting functions
+		</tocitem>
+	</tocitem>
+	<tocitem image="$toolbox/matlab/icons/pagesicon.gif" target="Acknowledgments.html">Acknowledgments
+	</tocitem>
+	<tocitem image="$toolbox/matlab/icons/pagesicon.gif" target="Bibliography.html">Bibliography
+	</tocitem>
+	<tocitem target="Help.html" image="$toolbox/matlab/images/reficon.gif">Function list
+	</tocitem>
+</tocitem>
+</toc>

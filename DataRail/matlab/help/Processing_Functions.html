@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Processing Functions</TITLE>
+<META NAME="description" CONTENT="Processing Functions">
+<META NAME="keywords" CONTENT="MatlabDataHandling">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="MatlabDataHandling.css">
+
+</HEAD>
+
+<BODY >
+
+<H2><A NAME="SECTION00062000000000000000">
+Processing Functions</A>
+</H2>
+The master function <A NAME="tex2html19"
+  HREF="Help.html#createDataCube"><TT>createDataCube</TT></A>
+transforms cubes into other cubes. 
+The function gets as input the fields required to define a new cube structure (Name, Info, Code, Parameters, and  SourceData). 
+For example:
+<PRE>
+Compendium.data(cub) = createDataCube(...
+ 'Name', 'RelativeMaxSignal', ...
+ 'Info', 'Normalized data where each measurement
+         is relative to the maximal value for 
+         the same signal', ...
+ 'Code', @MaxSignalRelativator, ...
+ 'Parameters',{'ExpNoise',0},...
+ 'CodeHashArray',Compendium.data(Compendium.v.Relat).CodeHashArray,...
+ 'SourceData', Compendium.data(Compendium.v.BackgroundSubtracted));
+</PRE>
+
+<P>
+A suite of functions to transform cubes has been created:
+
+<UL>
+<LI><A NAME="tex2html20"
+  HREF="Help.html#MaxSignalRelativator"><TT>MaxSignalRelativator</TT></A>
+divides the data by the maximum for the corresponding signal for all conditions.
+</LI>
+<LI><A NAME="tex2html21"
+  HREF="Help.html#GetConcentrations"><TT>GetConcentrations</TT></A>
+converts a canonical 5-D datacube from 50-plex signal to concentration of cytokines.
+</LI>
+<LI><A NAME="tex2html22"
+  HREF="Help.html#RemoveInputEqOutput"><TT>RemoveInputEqOutput</TT></A>
+emoves data from experiments where the input is the same as the output.
+</LI>
+<LI><A NAME="tex2html23"
+  HREF="Help.html#CanonicalForm"><TT>CanonicalForm</TT></A>
+ensures that the 2nd dim is time and 5th is signal in a data cube. 
+</LI>
+<LI><A NAME="tex2html24"
+  HREF="Help.html#GetRelative"><TT>GetRelative</TT></A>
+normalizes a datacube with respect to a particular treatment.     
+</LI>
+<LI><A NAME="tex2html25"
+  HREF="Help.html#createSubcube"><TT>createSubcube</TT></A>
+to slice a subcube out of cube.
+</LI>
+</UL>
+
+<P>
+A couple of auxiliary functions are also available:
+
+<UL>
+<LI><A NAME="tex2html26"
+  HREF="Help.html#RefreshCompendium"><TT>RefreshCompendium</TT></A>
+allows to refresh a Compendium after changing
+something (e.g. some data, a parameter). It is also useful to create copies os Compendia.
+</LI>
+<LI><A NAME="tex2html27"
+  HREF="Help.html#CreateShortcuts"><TT>CreateShortcuts</TT></A>
+creates an structure of shortcuts to access the elements in the cubes.  These shortcuts allow you to easily find particular positions in a certain dimension, e.g.
+<PRE>
+   Compendium.data(1).Value(v.Prim,1,v.EGF,v.PI3Ki,v.ERK12)
+</PRE>
+
+<P>
+</LI>
+<LI><A NAME="tex2html28"
+  HREF="Help.html#CreateCalibration"><TT>CreateCalibration</TT></A>
+creates the calibration curves for the cytokine concentrations.
+</LI>
+<LI><A NAME="tex2html29"
+  HREF="Help.html#PolishLabels"><TT>PolishLabels</TT></A>
+removes the MIDAS tags (TR, DA, DV) and other strings.
+</LI>
+<LI><A NAME="tex2html30"
+  HREF="Help.html#setParameters"><TT>setParameters</TT></A>
+sets the parameters for a particular function using explicit values wherever given or the default elsewhere.
+</LI>
+</UL>
+
+<P>
+<BR><HR>
+<ADDRESS>
+Julio Saez-Rodriguez & Arthur Goldsipe, 2007
+</ADDRESS>
+</BODY>
+</HTML>

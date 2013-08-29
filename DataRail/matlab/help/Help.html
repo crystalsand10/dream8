@@ -1,0 +1,2975 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /><link rel="stylesheet" href="file:////Applications/MATLAB74/toolbox/matlab/codetools/matlab-report-styles.css" type="text/css" />
+<title>Help Report</title>
+</head>
+<body>
+<div class="report-head">Help Report</div><p>
+<table border="0">
+<tr><td><form method="post" action="matlab:visdirrefresh">
+<input type="submit" value="Rerun This Report" />
+<input type="hidden" name="reporttype" value="helprpt" />
+<input type="hidden" name="option" value="dir" />
+<input type="hidden" name="name" value="/Users/doc/Doug/Compendia/trunk/share/matlab/ProcessingFiles" />
+</form></td>
+<td><form method="post" action="matlab:visdirrefresh">
+<input type="submit" value="Run Report on Current Directory" />
+<input type="hidden" name="reporttype" value="helprpt" />
+</form></td></tr>
+</table>
+<form method="post" action="matlab:visdirformhandler">
+<input type="hidden" name="reporttype" value="helprpt" />
+<table cellspacing="8">
+<tr>
+<td><input type="checkbox" name="helpSubfunsDisplayMode"  onChange="this.form.submit()" />Show subfunctions</td>
+<td><input type="checkbox" name="h1DisplayMode" checked onChange="this.form.submit()" />Description</td>
+<td><input type="checkbox" name="exampleDisplayMode"  onChange="this.form.submit()" />Examples</td>
+</tr><tr>
+<td><input type="checkbox" name="helpDisplayMode" checked onChange="this.form.submit()" />Show all help</td>
+<td><input type="checkbox" name="seeAlsoDisplayMode"  onChange="this.form.submit()" />See also</td>
+<td><input type="checkbox" name="copyrightDisplayMode"  onChange="this.form.submit()" />Copyright</td>
+</tr>
+</table>
+</form>
+Report for directory /Users/doc/Doug/Compendia/trunk/share/matlab/ProcessingFiles<p>
+<strong>M-File List</strong><br/>
+<table cellspacing="0" cellpadding="2" border="0">
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FBooleanizer.m'))" name="Booleanizer"><span class="mono">Booleanizer</span></a></td>
+<td class="td-linetopleft">
+<pre>discretize an5-D canonical data cube into a 5D {0,1} cube</pre>
+<pre>
+  discretize an5-D canonical data cube into a 5D {0,1} cube
+ 
+  BooleanData =Booleanizer(QuantData,Parameters) 
+ 
+ 
+ 
+  Rationale:
+ 
+  This function is thought to be used to perform a Boolean analysis or to
+  characterize the dynamics of the signals upon stimuli (used in plotting)
+ 
+  To be used within a Boolean Framework, the data has to be discretized.
+  In our case our models only include 2 possible values for the states (0 or 1).
+  We assume that, for time 0, all states are at value 0, except constitutive
+  inhibitors ('NegatOnes',  e.g. Ikb), which are active (1).
+  Besides, we consider 2 time scales, t=1 and t=2, corresponding to early and late time scale.
+  Thus, we have to decide whether the state changes from t=0 to t=1 from 0 to 1 (or 1 to 0), and,
+  if the state reaches the value 1 at t=1, it stays at value 1 for t=2  or goes down to 0.
+ 
+  To take the decision for time t=1, we use 3 criteria, each of which 
+  requires a threshold which has to be defined by the user:
+ 
+  i) Significant increase
+  Signal(t=1)/Signal(t=0))&gt; SigniPeak
+ 
+  ii) Signal significant with respect to maximum for this signal
+  Signal(t=1)/Signal_max &gt; ThresMax
+ 
+  iii) Signal above experimental noise
+  Signal(t=1) &gt; MinSignal
+ 
+  Finally, to define whether the signal decays at t=2, we define a new condition
+  Signal(t=2)/Signal(t=1)&lt; SigniDec
+ 
+  We use the threshold to respect to the maximum instead of e.g. uni variance to discretize the data. 
+  The reason is that here one has to define whether see if a signal 
+  has a significant increase from a certain resting state. 
+  If a signal goes up upon different conditions,
+  this should not change the fact that the signal is going up.
+  If one would use unit variance, then all these signals will be pushed down.
+  This perspective is different to e.g. PLSR where one is interested
+  in which conditions the change is more significant than in the rest.
+ 
+ --------------------------------------------------------------------------
+  INPUTS: 
+ 
+  QuantData = a canonical 5D datacube
+ 
+  Parameters: 
+   .SigniPeak(0.8)  = threshold for a significant incresae, see above
+    .SigniDec(0.7)  = threshold for a significant decrease, see above
+    .ThreshMax(0.1) = threshold for a significant value with respect of 
+                      rest of signals for the same readout, see above
+    .MinSignal(0.05)= experimental error, see above
+    .NegatOnes()    = function assumes 0 for t=0;
+                      States whose value is in resting state is 1 are listed here
+                      instead of 0 and may go to 0 upon activation 
+                      (e.g. when we are measruing the inhibitory site of a kinase)
+    .LabelsSignals  = Labels of Signals to map them to NegatOnes
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  
+  Data.data(4).Value =Booleanizer(Data.data(3).Value,Parameters) 
+ 
+  OR
+ 
+  Data.data(3) = createDataCube(...
+     'Name', 'Boolean', ...
+     'Info', 'data converted to digitalform',...
+     'Labels', Data.Labels, ...
+     'Code', @Booleanizer,...
+     'Parameters', {'SigniPeak', 0.6, 'SigniDec', 0.6, 'ThreshMax', 0.25, ...
+         'MinSignal', .51, 'NegatOnes', {'Ikb', 'GSK3'},...
+         'LabelsSignals', Data.Labels(5).Value}, ...
+     'SourceData', Data.data(ChrisData.v.preBoolean));        
+ --------------------------------------------------------------------------
+  TODO:
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FCanonicalForm.m'))" name="CanonicalForm"><span class="mono">CanonicalForm</span></a></td>
+<td class="td-linetopleft">
+<pre>CanonicalForm  ensures that the 2nd dim is time and 5th is signal in a data cube</pre>
+<pre>
+  CanonicalForm  ensures that the 2nd dim is time and 5th is signal in a data cube
+   
+    dataCube = CanonicalForm(dataCube)
+   
+ --------------------------------------------------------------------------
+  INPUTS:
+ 
+  dataCube = 5-dimensional data cube
+ 
+  OUTPUTS:
+ 
+  dataCube = 5-dimensional data cube in the canonical form
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+  Data.data(2).Value=CanonicalForm(Data.data(1).Value)
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FCreateCalibration.m'))" name="CreateCalibration"><span class="mono">CreateCalibration</span></a></td>
+<td class="td-linetopleft">
+<pre>CreateCalibration creates the calibration curves for the cytokine concentrations</pre>
+<pre>
+  CreateCalibration creates the calibration curves for the cytokine concentrations
+ 
+    [fitted_params]=CreateCalibration(Parameters)
+ 
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+ 
+  Parameters
+             .MidasFile('") = pass calibration curves as a midas file
+             .MatFile('')   = pass calibration curves a mat file
+             .Matrix('')    = to pass the calibration curves in Matrix form
+ 
+                              data provided with the standard samples
+ 
+             .PlotFits(no) = plots fits of calibration curves to
+                             calibration data
+ 
+  The calibration curves must be defined in the form:
+ 
+             MeasuredData = 14 X numberreadouts matrix with the data measured
+                            in the bioplex for the standard samples
+             CalibrationData = 14 X numberreadouts matrix with
+                            concentration
+ 
+  OUTPUTS:
+ 
+  fitted_params = structure with the fields
+               .Value= matrix will the parameters for the calibration curves
+               .Labels=array of strings with the labels of the readouts
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+    Parameters.Matfile='Cal_27x-5005744-Feb07_23x-5005844-Feb07.mat'
+    params= CreateCalibration(Parameters)
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  -
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FCreateShortcuts.m'))" name="CreateShortcuts"><span class="mono">CreateShortcuts</span></a></td>
+<td class="td-linetopleft">
+<pre>CreateShortcuts creates an structure of shortcuts to access the elements in the cubes,</pre>
+<pre>
+  CreateShortcuts creates an structure of shortcuts to access the elements in the cubes,
+ 
+  These shortcuts allow you to easily find particular positions in a certain dimension, e.g.
+    LeoData.data(1).Value(v.Prim,1,v.EGF,v.PI3Ki,v.ERK12)
+ 
+  function v=CreateShortcuts(Labels)
+ 
+   
+ --------------------------------------------------------------------------
+  INPUTS:
+ 
+  Labels = Structure with labels in the usual form
+ 
+  OUTPUTS:
+ 
+  v     = strcuture with the shortcuts
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+     LeoData.v=CreateShortcuts(Leodata.data(1).Labels)
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FGetConcentrations.m'))" name="GetConcentrations"><span class="mono">GetConcentrations</span></a></td>
+<td class="td-linetopleft">
+<pre>GetConcentrations converts a canonical 5-D datacube from 50-plex signal to concentration of cytokines</pre>
+<pre>
+  GetConcentrations converts a canonical 5-D datacube from 50-plex signal to concentration of cytokines
+ 
+  function NewData=GetConcentrations(OldData,Parameters)
+ 
+  This function convert a 5-D datacube where the signal is the 5th
+  dimension from 50-plex signal to concentration (cytokine release)
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+ 
+  OlData = 5-dimensional data cube in the canonical form
+ 
+  Parameters = 
+       .FitParameters(no default)= must be passed. Provides:
+                                   .Value = the values in a 5 X numreadouts matrix
+                                   .Labels= array of strings of labels
+                                   Can be created with CreateCalibration.m
+       .Labels(no default) = Labels of the Cube OldData
+ 
+  OUTPUTS:
+ 
+  NewData = 5-dimensional data cube in the canonical form
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+  Data.data(2).Value=GetConcentrations(Data.data(1).Value,Parameters)
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FGetRelative.m'))" name="GetRelative"><span class="mono">GetRelative</span></a></td>
+<td class="td-linetopleft">
+<pre>GetRelative normalizes a datacube with respect to a particular treatment</pre>
+<pre>
+  GetRelative normalizes a datacube with respect to a particular treatment
+ 
+  function NewData=GetRelative(NewData,RefTreat)
+ 
+   
+ --------------------------------------------------------------------------
+  INPUTS:
+ 
+  OlData = 5-dimensional data cube in the canonical form
+ 
+  Parameters = structure of parameters (default value in parenthesis)
+          .RefTreat(1) = reference treatment to divide by
+ 
+  OUTPUTS:
+ 
+  NewData = 5-dimensional data cube in the canonical form
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+  Data.data(2).Value=GetRelative(Data.data(1).Value,Parameters)
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FGetTimeCompressed.m'))" name="GetTimeCompressed"><span class="mono">GetTimeCompressed</span></a></td>
+<td class="td-linetopleft">
+<pre>compresses data cube of n time points into 2 or 3 + 0 timepoing</pre>
+<pre>
+  compresses data cube of n time points into 2 or 3 + 0 timepoing
+ 
+  RedData =GetTimeCompressed(QuantData,Parameters)
+ 
+ 
+ --------------------------------------------------------------------------
+  INPUTS: 
+ 
+  QuantData = a canonical datacube
+ 
+  Parameters 
+          .EarlyTimes(2)  = time points lumped into early time point
+          .LateTimes(3)   = time points lumped into late time points
+          .MidTimes()     = time points lumped into middle time points
+                            if empty creates a 2 + t0 timepoints
+          .Criterion(max) ='max' for taking the 'maximun' for early events
+                            (to catch the peak)
+                            or 'mean' for the mean. For the rest is the
+                            mean
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+  Parameters.EarlyTimes=[ 1 2 3]
+  Parameters.LateTimes=[4]
+  Parameters.MidTimes=[];
+ 
+  Data.data(4).Value=GetTimeCompressed(Data.data(3).Value,Parameters)
+ 
+  OR
+ 
+  Data.data(5) = createDataCube(...
+     'Name', 'BackgroundSComp', ...
+     'Info', 'data compressed into 2 time points', ...
+     'Labels', ChrisData.Labels, ...
+     'Code', @GetTimeCompressed,...
+     'Parameters',{'EarlyTimes',[2 3 4 5
+     6],'LateTimes',[7:10],'Criterion','max'},...    
+     'SourceData', Data.data(Data.v.RemovedInputEqOutput));   
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FGuiBooleanizerPars.m'))" name="GuiBooleanizerPars"><span class="mono">GuiBooleanizerPars</span></a></td>
+<td class="td-linetopleft">
+<pre>GuiBooleanizerPars loads the parameters for the function Booleanizer to discretize the data</pre>
+<pre>
+  GuiBooleanizerPars loads the parameters for the function Booleanizer to discretize the data
+ 
+  varargout = GuiBooleanizerPars(varargin)
+   
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+ 
+  varargin = a Cube Structure (Values + Labels)
+ 
+ 
+  OUTPUTS:
+ 
+  varargout = the structure of parameters for Booleanizer
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+  ParametersBool=GuiBooleanizerPars(Data.data(1));
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+    
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FGuiCreateCNADataPars.m'))" name="GuiCreateCNADataPars"><span class="mono">GuiCreateCNADataPars</span></a></td>
+<td class="td-linetopleft">
+<pre>GuiCreateCNADataPars loads the parameters for the function CreateCNADAta, to create data for CellNetAnalyzer</pre>
+<pre>
+  GuiCreateCNADataPars loads the parameters for the function CreateCNADAta, to create data for CellNetAnalyzer
+ 
+  varargout = GuiCreateCNADataPars(varargin)
+   
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+ 
+  varargin = Labels of Data Cube
+ 
+ 
+  OUTPUTS:
+ 
+  varargout = the structure of parameters for CreateCNAData
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+  Parameters=GuiCreateCNADataPars(SourceData.Labels);
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+    
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FGuiCreateDataCube.m'))" name="GuiCreateDataCube"><span class="mono">GuiCreateDataCube</span></a></td>
+<td class="td-linetopleft">
+<pre>GuiCreateDataCube helps you to create a data cube applying a certain transformation to another cube</pre>
+<pre>
+  GuiCreateDataCube helps you to create a data cube applying a certain transformation to another cube
+ 
+    varargout = GuiCreateDataCube(varargin)
+ 
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+ 
+  varargin = the Project and the index of the  input data cube
+ 
+ 
+  OUTPUTS:
+ 
+  varargout = the created  data cube  
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+   NewProject = GuiCreateDataCube(Project, [IndexCube])
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - Add more transforming functions
+   
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FGuiCreateSubCube.m'))" name="GuiCreateSubCube"><span class="mono">GuiCreateSubCube</span></a></td>
+<td class="td-linetopleft">
+<pre>GuiCreateSubCube helps to create a data cube out of a larger data cube</pre>
+<pre>
+  GuiCreateSubCube helps to create a data cube out of a larger data cube
+ 
+   varargout = GuiMidasImporter(varargin)
+   
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+ 
+  varargin = a cube structure
+ 
+ 
+  OUTPUTS:
+ 
+  varargout = the cube structure
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+   LeoData.data(3).Value=GuiMidasImporter(LeoData.data(2).Value)
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+     
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FGuiMain.m'))" name="GuiMain"><span class="mono">GuiMain</span></a></td>
+<td class="td-linetopleft">
+<pre>GuiMain coordinates the rest of GUIS related to the DataFlow processing</pre>
+<pre>
+  GuiMain coordinates the rest of GUIS related to the DataFlow processing
+ 
+  varargout = GuiMain(varargin)
+   
+ --------------------------------------------------------------------------
+  INPUTS:
+ 
+  varargin = not used
+ 
+ 
+  OUTPUTS:
+ 
+  varargout = the created project
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+   Project = GuiMain()
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+   
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FGuiMidasImporter.m'))" name="GuiMidasImporter"><span class="mono">GuiMidasImporter</span></a></td>
+<td class="td-linetopleft">
+<pre>GuiMidasImporter helps to load your MIDAS data into a Matlab n-dimensional data cube (n<=5)</pre>
+<pre>
+  GuiMidasImporter helps to load your MIDAS data into a Matlab n-dimensional data cube (n&lt;=5)
+ 
+   varargout = GuiMidasImporter(varargin)
+   
+  Results will be save as varargout in the workspace. 
+   You can also choose a mat file to save the  data cube
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+ 
+  varargin = a MIDAS file (optional)
+ 
+ 
+  OUTPUTS:
+ 
+  varargout = the data structure
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+   DataCube=GuiMidasImporter
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - 
+    
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FMaxSignalRelativator.m'))" name="MaxSignalRelativator"><span class="mono">MaxSignalRelativator</span></a></td>
+<td class="td-linetopleft">
+<pre>MaxSignalRelativator divides the data by the maximum for the corresponding signal for all conditions </pre>
+<pre>
+   MaxSignalRelativator divides the data by the maximum for the corresponding signal for all conditions 
+ 
+   NewData=MaxSignalRelativator(OldData,Parameters)
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+ 
+  OlData = 5-dimensional data cube in the canonical form
+ 
+  Parameters = structure of parameters (default value in parenthesis)
+          .AcrossCells(yes) = to consider maximal value of all cell types
+          .ExpNoise(500) =  value below which the signal is consider NaN
+ 
+ 
+  OUTPUTS:
+ 
+  NewData = 5-dimensional data cube in the canonical form
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+  Data.data(2).Value=MaxSignalRelativator(Data.data(1).Value,Parameters)
+ 
+ --------------------------------------------------------------------------
+  TODO:  
+ 
+  - 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FMidasImporter.m'))" name="MidasImporter"><span class="mono">MidasImporter</span></a></td>
+<td class="td-linetopleft">
+<pre>MidasImporterMain reads a CSV file based on the Midas standard</pre>
+<pre>
+  MidasImporterMain reads a CSV file based on the Midas standard
+ 
+  [data, dimNames, dimValues] = MidasImporter(filename, ...
+              dimCols, timeCols, valueCols, parameters)
+   or
+ 
+  [dataCube] = MidasImporter(...)
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+  filename  = name of CSV file
+  dimCols   = cell of cells containing column names or numbers for the
+              columns comprising each dimension
+  timeCols  = cells containing column names or numbers for the
+              columns comprising the time dimension
+  valueCols = cells containing column names or numbers for each "value" field
+  parameters = optional structure of parameters (default value in parenthesis)
+               .IgnoreMissing(true) = true to ignore missing values, rather than
+                                treat them as NaN's
+ 
+  OUTPUTS:
+  data      = hypercube of data
+  dimNames  = field names (labels) for each of the dimensions
+  dimValues = values for each dimension
+  dataCube  = data cube structure
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  [data, names, values] = MidasImporter(filename, ...
+         {...% Column names or numbers for each dimension
+         {'TR:HepG2'},%dimension 1 = cells
+         {'TR:NO-CYTO','TR:EGF','TR:HER','TR:AMP','TR:TGF','TR:EGF-HER',...
+          'TR:HER-TGF','TR:AMP-EGF','TR:EPI-TGF','TR:TGF-EGF'},
+         {'TR:NO-DRUG','TR:PI3Ki'},
+          },...
+          {'DA:AKT','DA:ERK12'},...
+          {'DV:AKT','DV:ERK12'}...
+          );
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - Check the consistency of DA: and DV: fields
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FPolishLabels.m'))" name="PolishLabels"><span class="mono">PolishLabels</span></a></td>
+<td class="td-linetopleft">
+<pre>PolishLabels removes the MIDAS tags (TR, DA, DV) and other strings</pre>
+<pre>
+  PolishLabels removes the MIDAS tags (TR, DA, DV) and other strings
+   
+  In particular, it removes
+  - the =1 text created by the MidasImporter
+  - parenthized expressions (e.g. BioPlex bead numbers)  
+  - replaces "_" with "-" for nicer labeling in matlab plots
+  - removes leading and TRAILing whitespaces
+   
+   NewLabels=PolishLabels(Labels)
+ 
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+ 
+  Labels = Structure with Labels
+ 
+ 
+  OUTPUTS:
+ 
+  NewLabels = Structure with  nicer labels
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+  Labels=PolishLabels(Labels);
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FRefreshCompendium.m'))" name="RefreshCompendium"><span class="mono">RefreshCompendium</span></a></td>
+<td class="td-linetopleft">
+<pre>RefreshCompendium(Compendium) reruns the creation of all cubes</pre>
+<pre>
+  RefreshCompendium(Compendium) reruns the creation of all cubes
+ 
+  Compendium=RefreshCompendium(Compendium,Parameters)
+ 
+ --------------------------------------------------------------------------
+  INPUTS: 
+  Compendium =a SBDataPipe Compendium
+ 
+  Parameters(optional)
+     .useStoredFunctions(true) = true to choose the function stored in the
+                                 CodeHashArray, false to use the current version
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+   Comp2 = RefreshCompendium(Comp,[])
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FRemoveInputEqOutput.m'))" name="RemoveInputEqOutput"><span class="mono">RemoveInputEqOutput</span></a></td>
+<td class="td-linetopleft">
+<pre>RemoveInputEqOutput removes data where output signals match stimuli or inhibitors</pre>
+<pre>
+  RemoveInputEqOutput removes data where output signals match stimuli or inhibitors
+ 
+    NewData=RemoveInputEqOutput(OldData,Parameters)
+ --------------------------------------------------------------------------
+  INPUTS:
+  OlData = 5-dimensional data cube in the canonical form
+ 
+  Parameters = structure of parameters (default value in parenthesis)
+      .Labels(required) = Labels to perform the match of names
+      .Replacement(NaN) = value to replace with. It can be
+                          * a number that multiplies the non-perturbation value,
+                          * the string 'mean', which takes the mean across
+                            other cues OR inhibitors when a match is found
+                          * the string 'meanAll', which takes the mean
+                            across BOTH cues AND inhibitors when a match is
+                            found
+      .CueDim(3)        = The dimension that corresponds to input cues
+                          (typically, stimulating cytokines)
+      .InhibitorDim(4)  = The dimension that corresponds to inhibitors
+      .SignalDim(5)     = The dimension that corresponds to the signals (outputs)
+      .SpecialInhibitors= Cell string of special inhibitors that are
+                          ignored (default is {'DMSO', 'NOINHIB'})
+      .CueNonPerturbed(1) = Index of non-perturbed cue condition
+      .InhibitorNonPerturbed(1) = Index of non-perturbed inhibitor condition
+ 
+  OUTPUTS:
+ 
+  NewData = 5-dimensional data cube in the canonical form
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  Parameters.Labels=Data.data(1).Labels
+  Data.data(cub+1).Value=RemoveInputEqOutput(Data.data(1).Value,Parameters)
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - Correctly handle a simultaneous match in cues AND inhibitors (is this
+    relevant?)
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FSendData.m'))" name="SendData"><span class="mono">SendData</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+ --------------------------------------------------------------------------
+ function SendData(Data,receiver)
+ 
+    04/18/07 J. Saez
+ 
+ --------------------------------------------------------------------------
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FTemplateFunction.m'))" name="TemplateFunction"><span class="mono">TemplateFunction</span></a></td>
+<td class="td-linetopleft">
+<pre>MidasImporterMain reads a CSV file based on the MIDAS standard</pre>
+<pre>
+  MidasImporterMain reads a CSV file based on the MIDAS standard
+ 
+  [data, dimNames, dimValues] = MidasImporter(filename, ...
+              dimCols, timeCols, valueCols, parameters)
+   or
+ 
+  [dataCube] = MidasImporter(...)
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+  filename  = name of CSV file
+  dimCols   = cell of cells containing column names or numbers for the
+              columns comprising each dimension
+  timeCols  = cells containing column names or numbers for the
+              columns comprising the time dimension
+  valueCols = cells containing column names or numbers for each "value" field
+  parameters(default) = optional structure of parameters
+              .IgnoreMissing (true) = true to ignore missing values, rather than
+                                treat them as NaN's
+ 
+  OUTPUTS:
+  data      = hypercube of data
+  dimNames  = field names (labels) for each of the dimensions
+  dimValues = values for each dimension
+  dataCube  = data cube structure
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  [data, names, values] = MidasImporter(filename, ...
+         {...% Column names or numbers for each dimension
+         {'TR:HepG2'},%dimension 1 = cells
+         {'TR:NO-CYTO','TR:EGF','TR:HER','TR:AMP','TR:TGF','TR:EGF-HER',...
+          'TR:HER-TGF','TR:AMP-EGF','TR:EPI-TGF','TR:TGF-EGF'},
+         {'TR:NO-DRUG','TR:PI3Ki'},
+          },...
+          {'DA:AKT','DA:ERK12'},...
+          {'DV:AKT','DV:ERK12'}...
+          );
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - Check the consistency of DA: and DV: fields
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2Fassert2.m'))" name="assert2"><span class="mono">assert2</span></a></td>
+<td class="td-linetopleft">
+<pre>assert2 - Similar to the C "assert2" function</pre>
+<pre>
+ assert2 - Similar to the C "assert2" function
+ 
+  assert2(cond,msg)
+ 
+  cond should be an expression which is believed to be true.
+  msg is a message describing the assert2ion.
+ 
+  e.g. assert2(x&gt;5 &amp;&amp; x&lt;20,'x is within the allowed limits')
+ 
+  This should not be thought of as "normal" error handling.
+  It is designed to help catch bugs in the code, and so the
+  call stack is printed in the command window (so that it
+  is not lost if the error is caught).
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2Fbioplex2midas.m'))" name="bioplex2midas"><span class="mono">bioplex2midas</span></a></td>
+<td class="td-linetopleft">
+<pre>BIOPLEX2MIDAS converts BioPlex data Files to the MIDAS format</pre>
+<pre>
+  BIOPLEX2MIDAS converts BioPlex data Files to the MIDAS format
+ 
+  bioplex2midas(dataFile, treatmentFile, outputFile, acquisitionDate)
+ 
+ --------------------------------------------------------------------------
+  INPUTS: 
+   
+  dataFile      = name of BioPlex data file
+  treatmentFile = name of the file describing the treatments and
+                  descriptions
+  outputFile    = name of the output file
+  acquisitionDate = (optional) the date/time of the data acquisition
+ 
+  treatmentFile format: See Example_names_for_Bioplex.txt
+ 
+  OUTPUTS:
+ 
+  None
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  
+  bioplex2midas('../Data/Leo/1oHum_03hrs_pl02_17plex.txt', ...
+    'Example_names_for_Bioplex.txt', 'out.csv');
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FcheckDataCube.m'))" name="checkDataCube"><span class="mono">checkDataCube</span></a></td>
+<td class="td-linetopleft">
+<pre>checkDataCube checks that the fields of a data cube are consistent</pre>
+<pre>
+  checkDataCube checks that the fields of a data cube are consistent
+ 
+  messages = checkDataCube(data)
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+  data      = data cube to check
+ 
+  OUTPUTS:
+  messages  = list of warning messages; and empty cell if no warnings were
+              issued
+ 
+  Note: To disable the printing of warnings, use the command
+        warnings('off', 'checkDataCube:InvalidField')
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  messages = checkDataCube(data)
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FcollapseDataCube.m'))" name="collapseDataCube"><span class="mono">collapseDataCube</span></a></td>
+<td class="td-linetopleft">
+<pre>collapseDataCube collapses dimensions and labels in a datacube</pre>
+<pre>
+  collapseDataCube collapses dimensions and labels in a datacube
+ 
+  [newData, Parameters] = collapseDataCube(oldData, Parameters)
+ 
+  Collapse the requested dimensions of oldData &amp; combine the corresponding
+  labels.
+ --------------------------------------------------------------------------
+  INPUTS:
+  oldData   = a datacube structure
+  Parameters(default) = optional structure of Parameters
+      .Dims ([])      = Dimensions to collapse
+      .Labels ([])    = structure containing Name and Value fields for
+                        dimension labels
+      .NewDim (1)     = Location of the collapsed dimension in NewData
+      .NewDimName('CollapsedDimension') = name of the new dimension
+      .NewDimFormatter(@defaultFormater) = 
+                        a handle to a function to format the Value
+                        string of the new dimension's labels. See the
+                        source code for the default formatter, which
+                        basically concatenates labels.
+      .RemoveNaNs(false) = if true, removed collapsed rows which are all NaNs.
+ 
+  OUTPUTS:
+  newData   = new datacube structure
+  Parameters = structure of inputted Parameters AND
+    .Labels     = new Labels structure
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  newData = collapseDataCube(oldData, struct('Dims', [1 2 3]));
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FcompareModels.m'))" name="compareModels"><span class="mono">compareModels</span></a></td>
+<td class="td-linetopleft">
+<pre>compareModels compares various input/output models of different processed data cubes</pre>
+<pre>
+  compareModels compares various input/output models of different processed data cubes
+ 
+  results = compareModels(xDataCubes, yDataCubes, Parameters)
+ 
+ --------------------------------------------------------------------------
+ INPUTS:
+  xDataCubes  = array of input (X) data cube STRUCTURES
+  yDataCubes  = array of output (Y) data cube STRUCTURES
+  Parameters  = a multi-level structure of parameters
+     .DataMode = OPTIONAL string
+                       Default: If empty or set to 'Independent', then X
+                       and Y data are steppend through independently.
+                       If set to 'Dependent', then X and Y data are
+                       stepped through simultaneously. In this case,
+                       XDataCubes &amp; YDataCubes must have the same size.
+     .XProcessing = structure array, one per pre/post processing step
+       .PreFunction    = pre-processing function
+       .PreParameters  = pre-processing parameters
+       .PostFunction   = post-processing function
+       .PostParameters = post-processing parameters
+     .YProcessing = OPTIONAL structure array, formatted like XProcessing
+                   If not supplied, the same processing is ued for both X and Y data 
+     .ProcessingMode = OPTIONAL string
+                       Default: If empty or set to 'Independent', then X
+                       and Y processing are done independently.
+                       If set to 'Dependent', then X and Y are
+                       processed simultaneously. In this case,
+                       XProcessing &amp; YProcessing must have the same size.
+     .Models    = structure array, one per modeling step
+       .Function       = modeling function
+       .Parameters     = modeling parameters
+     .XStandardizers = structure array, one per dataCube
+       .Function       = standardizing function
+       .Parameters     = standardizing parameters
+     .YStandardizers = OPTIONAL structure array, formatted like XProcessing
+                   If not supplied, the same processing is ued for both X and Y data 
+     .Comparisons = OPTIONAL structure array (one per yDataCube) for comparison of model results
+       .Function       = comparison function
+       .Parameters     = comparison parameters
+ 
+  Notes:
+  (1) Processing and Standardizing functions should use the following interface:
+     [outDataValue, outParameters] = f(inDataValue, inParameters)
+     where inDataValue and outDataValue are data.Value arrays and
+     inParameters and outParameters are Parameter structures.
+  (2) Model functions should use the following interface:
+     [modelXData, modelYData, modelOutputs] = g(xData, yData, modelParameters)
+ 
+ OUTPUTS:
+  results    = a structure of modeling results
+     .TODO
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  - TODO
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FcreateDataCube.m'))" name="createDataCube"><span class="mono">createDataCube</span></a></td>
+<td class="td-linetopleft">
+<pre>createDataCube('param1',value1,...) creates a dataCube structure</pre>
+<pre>
+  createDataCube('param1',value1,...) creates a dataCube structure
+   
+   data = createDataCube(varargin)
+ 
+ --------------------------------------------------------------------------
+  INPUTS: 
+ 
+   
+  No arguments are required. The following arguments are valid:
+ 
+  Name        A string description of the data. If not supplied, it will be
+              generated automatically by combining SourceData and Code
+              arguments (if present)
+ 
+  Info        A longer description of the data
+ 
+  Labels      A structure array describing the dimensions of the cube.
+              The structure contains two fields:
+              Labels(i).Name is the name of the i'th dimension
+              Labels(i).Value is a cell string of the values of each level
+                              of the i'th dimesion
+              Note: if no labels are provided but a dataCube is provided in
+              SourceData, labels will be extracted from the cube.
+ 
+  Value       The actual data values. If not supplied, automatically
+              generated using SourceData and Code (if present)
+ 
+  SourceData  Either a string name or another dataCube
+ 
+  Code        Function name (as a string) or a function handle, used to
+              dynamically generate the Value field.
+              The function must be of the form:
+                 [newData, newLabels] = Code(oldData, Parameters)
+              where oldData is an array and Parameters a structure
+              newData is an array and newLabels is an OPTIONAL return
+              argument of new labels generated from an optional argument 
+              Parameters.Labels
+ 
+  CodeHashArray A CodeHashArray object that contains a snapshot of the
+              M-files used to generate the data.
+              ** If CodeHashArray is not supplied, a snapshot of Code and
+                 all its dependent functions will be stored here **
+              ** If CodeHashArray is suplied, Code must also be supplied,
+                 and this snapshot of Code (and its dependent functions)
+                 will be used to dynamically generate the Value field.
+ 
+  Parameters  This is the second argument to the Code function and is a
+              structure. For convenience, a cell of Name, Values can be
+              supplied, and the structure will be created dynamically.
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  Example 1: Creating a dataCube by passing a function handle and a
+  parameter structure
+ 
+     Parameters(1).Name='EarlyTimes'; Parameters(1).Value= [2];
+     Parameters(2).Name='LateTimes';  Parameters(2).Value= [3 4 5];
+     Data.data(v.TimeC) = createDataCube(...
+        'Name', 'BackgroundSCompressed', ...
+        'Code', @GetTimeCompressed, ...
+        'Parameters', Parameters, ...
+        'SourceData', Data.data(v.BackS));  
+ 
+ % Example 2: Creating a dataCube by passing a function handle and
+  a cell of parameter values
+ 
+    Data.data(v.Bool) = createDataCube(...
+        'Name', 'Boolean', ...
+        'Info', 'data BsaNormalized converted in a {0 1} digital form', ...
+        'Code', @Booleanizer2, ...
+        'Parameters', {'SigniPeak', 0.72, ...
+                       'SigniDec', 0.82, ...
+                       'ThreshMax', 0.15, ...
+                       'MinSignal', 8, ...
+                       'NegatOnes', {'Ikb', 'GSK3'},...
+                       'LabelsSignals', Data.data(v.TimeC).Labels(5).Value}, ...
+        'SourceData', Data.data(v.TimeC) );
+ 
+ % Example 3: Re-creating a dataCube by passing a CodeHashArray
+ 
+     Data.data(v.Relat) = createDataCube(...
+        'Name', 'RelativeMaxSignal', ...
+        'Info', 'BsaNormalized data where each measurement is relative to the maximal value for the same signal', ...
+        'Code', @MaxSignalRelativator, ...
+        'CodeHashArray',  Data.data(v.Relat).CodeHashArray,...
+        'SourceData', Data.data(v.BackS));
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - Support Code functions that alter labels
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FcreateSubcube.m'))" name="createSubcube"><span class="mono">createSubcube</span></a></td>
+<td class="td-linetopleft">
+<pre>createSubcube creates the requested subcube and corresponding labels</pre>
+<pre>
+  createSubcube creates the requested subcube and corresponding labels
+ 
+  [data, newLabels] = createSubcube(data, Parameters)
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+  data       = Hypercube of data
+  Parameters = Structure of parameters
+    .Labels  = Optional list of dimension labels
+    .Keep    = Cell listing elements (by array index) to keep for each dimension.
+               A missing/empty value in the cell means to keep all values
+               of the corresponding dimension.
+ 
+  OUTPUTS:
+  newData    = new sub-hypercube of data
+  Parameters = structure of inputted Parameters AND
+    .Labels     = new Labels structure
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+  Parameters.Keep = {[1 3], [2]};
+  Parameters.Labels = labels;
+  [newData, Parameters] = createSubcube(data, Parameters)
+ 
+  % This command creates a subcube consisting of the 1st and 3rd rows (the
+  % 1st dimension; the 2nd column (the 2nd dimension); and all subsequent
+  % dimensions.
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2Fcsvread2.m'))" name="csvread2"><span class="mono">csvread2</span></a></td>
+<td class="td-linetopleft">
+<pre>CSVREAD2 reads in a CSV file that contains multipe header rows/columns</pre>
+<pre>
+  CSVREAD2 reads in a CSV file that contains multipe header rows/columns
+  [data, colHeaders, rowHeaders, headerHeaders] = mycsvread(filename, delimiter)
+  filename = name of file
+  delimiter = optional delimiter (defaults to ",")
+ 
+  data = the numeric array in the csv file
+  colHeaders = cell of strings 
+  rowHeaders = cell of strings
+  headerHeaders = any extra rows of text found before the data
+  textData = contents of file as a cell string
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FgenerateHelpFiles.m'))" name="generateHelpFiles"><span class="mono">generateHelpFiles</span></a></td>
+<td class="td-linetopleft">
+<pre>generateHelpFiles creates helpfiles for functions in the toolbox</pre>
+<pre>
+  generateHelpFiles creates helpfiles for functions in the toolbox
+ 
+  generateHelpFiles
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+  None
+ 
+  OUTPUTS:
+  None
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+ --------------------------------------------------------------------------
+  TODO:
+  Check anchor names for unacceptable characters
+  Make sure anchor names are unique
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FmakeMinMin.m'))" name="makeMinMin"><span class="mono">makeMinMin</span></a></td>
+<td class="td-linetopleft">
+<pre>makeMinMin adds a constant to data so that the min is at least a minimum value</pre>
+<pre>
+  makeMinMin adds a constant to data so that the min is at least a minimum value
+ 
+  [newData, addData] = makeRelativeToMax(oldData, Parameters)
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+  oldData   = hypercube of data values
+  Parameters = optional structure of parameters
+              .NewMin(1) = the new minimum min
+              .Modes(1) = modes across which the min should be take
+              .NotModes([]) = modes across which the min should NOT be taken
+                 NOTE: Either Modes or NotModes should be specified, but
+                 not both!
+ 
+  OUTPUTS:
+  newData   = re-scaled hypercube of data
+  addData   = hypercube of values used to scale each data point
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  [newData, addData] = makeMinMin(oldData, struct('NewMin', 0, 'Modes', [2 3]));
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FmakeRelativeToMax.m'))" name="makeRelativeToMax"><span class="mono">makeRelativeToMax</span></a></td>
+<td class="td-linetopleft">
+<pre>makeRelativeToMax divides data by maximum across specified dimensions</pre>
+<pre>
+  makeRelativeToMax divides data by maximum across specified dimensions
+ 
+  [newData, maxData] = makeRelativeToMax(oldData, Parameters)
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+  oldData   = hypercube of data values
+  Parameters = optional structure of parameters
+              .Modes(1) = modes across which the max should be take
+              .NotModes([]) = modes across which the max should NOT be taken
+                 NOTE: Either Modes or NotModes should be specified, but
+                 not both!
+ 
+  OUTPUTS:
+  newData   = re-scaled hypercube of data
+  maxData   = hypercube of maximum values used to scale each data point
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  [newData, maxData] = makeRelativeToMax(oldData, struct('Modes', [2 3]));
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FnanBlocks.m'))" name="nanBlocks"><span class="mono">nanBlocks</span></a></td>
+<td class="td-linetopleft">
+<pre>NANBLOCKS identifies blocks of NaN's in a multi-dimensional array</pre>
+<pre>
+  NANBLOCKS identifies blocks of NaN's in a multi-dimensional array
+ 
+  [blocks, iStart, iEnd] = nanBlocks(data)
+ 
+  INPUTS:
+    data = multidimensional array of data
+ 
+  OUTPUTS:
+    blocks = cell array, each element is a list of subscripts for blocks of
+             NaN's, e.g. data(blocks{1}{:}) is the first block of NaN's
+    iStart = 2D array of starting subscripts for blocks. Each row is a 
+             different block, and each subscript a different dimension. For
+             example, iStart(1,:) are the subscripts of the first NaN of 
+             the first block.
+    iEnd   = 2D array of ending subscripts for blocks. Each row is a 
+             different block, and each subscript a different dimension. For
+             example, iEnd(1,:) are the subscripts of the last NaN of the 
+             first block.
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2Fnanmax.m'))" name="nanmax"><span class="mono">nanmax</span></a></td>
+<td class="td-linetopleft">
+<pre>FORMAT: [Y,IDX] = NANMAX(A,DIM,[B])</pre>
+<pre>
+  FORMAT: [Y,IDX] = NANMAX(A,DIM,[B])
+  
+     Maximum ignoring NaNs
+ 
+     This function enhances the functionality of NANMAX as distributed in
+     the MATLAB Statistics Toolbox and is meant as a replacement (hence the
+     identical name).
+ 
+     If fact NANMAX simply rearranges the input arguments to MAX because
+     MAX already ignores NaNs.
+ 
+     NANMAX(A,DIM) calculates the maximum of A along the dimension DIM of
+     the N-D array X. If DIM is omitted NANMAX calculates the maximum along
+     the first non-singleton dimension of X.
+ 
+     NANMAX(A,[],B) returns the minimum of the N-D arrays A and B.  A and
+     B must be of the same size.
+ 
+     Comparing two matrices in a particular dimension is not supported,
+     e.g. NANMAX(A,2,B) is invalid.
+     
+     [Y,IDX] = NANMAX(X,DIM) returns the index to the maximum in IDX.
+     
+     Similar replacements exist for NANMIN, NANMEAN, NANSTD, NANMEDIAN and
+     NANSUM which are all part of the NaN-suite.
+ 
+     See also MAX
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2Fnanmean.m'))" name="nanmean"><span class="mono">nanmean</span></a></td>
+<td class="td-linetopleft">
+<pre>FORMAT: Y = NANMEAN(X,DIM)</pre>
+<pre>
+  FORMAT: Y = NANMEAN(X,DIM)
+  
+     Average or mean value ignoring NaNs
+ 
+     This function enhances the functionality of NANMEAN as distributed in
+     the MATLAB Statistics Toolbox and is meant as a replacement (hence the
+     identical name).  
+ 
+     NANMEAN(X,DIM) calculates the mean along any dimension of the N-D
+     array X ignoring NaNs.  If DIM is omitted NANMEAN averages along the
+     first non-singleton dimension of X.
+ 
+     Similar replacements exist for NANSTD, NANMEDIAN, NANMIN, NANMAX, and
+     NANSUM which are all part of the NaN-suite.
+ 
+     See also MEAN
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2Fnanmedian.m'))" name="nanmedian"><span class="mono">nanmedian</span></a></td>
+<td class="td-linetopleft">
+<pre>FORMAT: Y = NANMEDIAN(X,DIM)</pre>
+<pre>
+  FORMAT: Y = NANMEDIAN(X,DIM)
+  
+     Median ignoring NaNs
+ 
+     This function enhances the functionality of NANMEDIAN as distributed
+     in the MATLAB Statistics Toolbox and is meant as a replacement (hence
+     the identical name).  
+ 
+     NANMEDIAN(X,DIM) calculates the mean along any dimension of the N-D
+     array X ignoring NaNs.  If DIM is omitted NANMEDIAN averages along the
+     first non-singleton dimension of X.
+ 
+     Similar replacements exist for NANMEAN, NANSTD, NANMIN, NANMAX, and
+     NANSUM which are all part of the NaN-suite.
+ 
+     See also MEDIAN
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2Fnanmin.m'))" name="nanmin"><span class="mono">nanmin</span></a></td>
+<td class="td-linetopleft">
+<pre>FORMAT: [Y,IDX] = NANMIN(A,DIM,[B])</pre>
+<pre>
+  FORMAT: [Y,IDX] = NANMIN(A,DIM,[B])
+  
+     Minimum ignoring NaNs
+ 
+     This function enhances the functionality of NANMIN as distributed in
+     the MATLAB Statistics Toolbox and is meant as a replacement (hence the
+     identical name).
+ 
+     If fact NANMIN simply rearranges the input arguments to MIN because
+     MIN already ignores NaNs.
+ 
+     NANMIN(A,DIM) calculates the minimum of A along the dimension DIM of
+     the N-D array X. If DIM is omitted NANMIN calculates the minimum along
+     the first non-singleton dimension of X.
+ 
+     NANMIN(A,[],B) returns the minimum of the N-D arrays A and B.  A and
+     B must be of the same size.
+ 
+     Comparing two matrices in a particular dimension is not supported,
+     e.g. NANMIN(A,2,B) is invalid.
+     
+     [Y,IDX] = NANMIN(X,DIM) returns the index to the minimum in IDX.
+     
+     Similar replacements exist for NANMAX, NANMEAN, NANSTD, NANMEDIAN and
+     NANSUM which are all part of the NaN-suite.
+ 
+     See also MIN
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2Fnansem.m'))" name="nansem"><span class="mono">nansem</span></a></td>
+<td class="td-linetopleft">
+<pre>FORMAT: Y = NANSEM(X,DIM)</pre>
+<pre>
+  FORMAT: Y = NANSEM(X,DIM)
+  
+     Standard error of the mean ignoring NaNs
+ 
+     NANSTD(X,DIM) calculates the standard error of the mean along any
+     dimension of the N-D array X ignoring NaNs.  
+ 
+     If DIM is omitted NANSTD calculates the standard deviation along first
+     non-singleton dimension of X.
+ 
+     Similar functions exist: NANMEAN, NANSTD, NANMEDIAN, NANMIN, NANMAX, and
+     NANSUM which are all part of the NaN-suite.
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2Fnanstd.m'))" name="nanstd"><span class="mono">nanstd</span></a></td>
+<td class="td-linetopleft">
+<pre>FORMAT: Y = NANSTD(X,DIM,FLAG)</pre>
+<pre>
+  FORMAT: Y = NANSTD(X,DIM,FLAG)
+  
+     Standard deviation ignoring NaNs
+ 
+     This function enhances the functionality of NANSTD as distributed in
+     the MATLAB Statistics Toolbox and is meant as a replacement (hence the
+     identical name).  
+ 
+     NANSTD(X,DIM) calculates the standard deviation along any dimension of
+     the N-D array X ignoring NaNs.  
+ 
+     NANSTD(X,DIM,0) normalizes by (N-1) where N is SIZE(X,DIM).  This make
+     NANSTD(X,DIM).^2 the best unbiased estimate of the variance if X is
+     a sample of a normal distribution. If omitted FLAG is set to zero.
+     
+     NANSTD(X,DIM,1) normalizes by N and produces the square root of the
+     second moment of the sample about the mean.
+ 
+     If DIM is omitted NANSTD calculates the standard deviation along first
+     non-singleton dimension of X.
+ 
+     Similar replacements exist for NANMEAN, NANMEDIAN, NANMIN, NANMAX, and
+     NANSUM which are all part of the NaN-suite.
+ 
+     See also STD
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2Fnansum.m'))" name="nansum"><span class="mono">nansum</span></a></td>
+<td class="td-linetopleft">
+<pre>FORMAT: Y = NANSUM(X,DIM)</pre>
+<pre>
+  FORMAT: Y = NANSUM(X,DIM)
+  
+     Sum of values ignoring NaNs
+ 
+     This function enhances the functionality of NANSUM as distributed in
+     the MATLAB Statistics Toolbox and is meant as a replacement (hence the
+     identical name).  
+ 
+     NANSUM(X,DIM) calculates the mean along any dimension of the N-D array
+     X ignoring NaNs.  If DIM is omitted NANSUM averages along the first
+     non-singleton dimension of X.
+ 
+     Similar replacements exist for NANMEAN, NANSTD, NANMEDIAN, NANMIN, and
+     NANMAX which are all part of the NaN-suite.
+ 
+     See also SUM
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FparseLine.m'))" name="parseLine"><span class="mono">parseLine</span></a></td>
+<td class="td-linetopleft">
+<pre>parseLine parses a line from a test file</pre>
+<pre>
+  parseLine parses a line from a test file
+ 
+  result = parseLine(line)
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+  line      = a line (string) of text
+ 
+  OUTPUTS:
+  result    = a cell of string results
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  results = parseLine('"Treatment 1",1,2,3');
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - Check the consistency of DA: and DV: fields
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FsetParameters.m'))" name="setParameters"><span class="mono">setParameters</span></a></td>
+<td class="td-linetopleft">
+<pre>setParameters sets parameters based on default and explicit values</pre>
+<pre>
+  setParameters sets parameters based on default and explicit values
+ 
+  Parameters = setParameters(DefaultParameters, NewParameters)
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+  DefaultParameters  = structure containing default parameter values
+  NewParameters      = structure containing new parameter values
+                                treat them as NaN's
+ 
+  Note: NewParameters can be in one of two forms.
+   * In form 1 (the preferred form), each strucure field name is a
+     parameter name, and the field value is the parameter value
+   * In form 2 (deprecated), the structure is a vector containing two
+     fields, Name and Value, where Name is the parameter name and
+     Value is the parameter value.
+ 
+  OUTPUTS:
+  Parameters         = structure containing default and new parameter values
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  DefaultParameters = struct('MinX', 1, 'MinY', 1);
+  Parameters = setParameters(DefaultParameters, NewParameters);
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FProcessingFiles%2FsplitString.m'))" name="splitString"><span class="mono">splitString</span></a></td>
+<td class="td-linetopleft">
+<pre>splitString splits a string between tokens</pre>
+<pre>
+  splitString splits a string between tokens
+ 
+  list = splitString(string, token)
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+  string    = character string
+  token     = token string (but NOT a regular expression)
+ 
+  OUTPUTS:
+  list      = cell string
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  list = splitString('a, b, c', ', ');
+  (list should be {'a', 'b', 'c'})
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  - add support for regular expressions (or just use regexp in R2007b)
+ 
+<br/>
+</pre>
+</td></tr>
+</table>
+</body></html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /><link rel="stylesheet" href="file:////Applications/MATLAB74/toolbox/matlab/codetools/matlab-report-styles.css" type="text/css" />
+<title>Help Report</title>
+</head>
+<body>
+<div class="report-head">Help Report</div><p>
+<table border="0">
+<tr><td><form method="post" action="matlab:visdirrefresh">
+<input type="submit" value="Rerun This Report" />
+<input type="hidden" name="reporttype" value="helprpt" />
+<input type="hidden" name="option" value="dir" />
+<input type="hidden" name="name" value="/Users/doc/Doug/Compendia/trunk/share/matlab/PlottingFiles" />
+</form></td>
+<td><form method="post" action="matlab:visdirrefresh">
+<input type="submit" value="Run Report on Current Directory" />
+<input type="hidden" name="reporttype" value="helprpt" />
+</form></td></tr>
+</table>
+<form method="post" action="matlab:visdirformhandler">
+<input type="hidden" name="reporttype" value="helprpt" />
+<table cellspacing="8">
+<tr>
+<td><input type="checkbox" name="helpSubfunsDisplayMode"  onChange="this.form.submit()" />Show subfunctions</td>
+<td><input type="checkbox" name="h1DisplayMode" checked onChange="this.form.submit()" />Description</td>
+<td><input type="checkbox" name="exampleDisplayMode"  onChange="this.form.submit()" />Examples</td>
+</tr><tr>
+<td><input type="checkbox" name="helpDisplayMode" checked onChange="this.form.submit()" />Show all help</td>
+<td><input type="checkbox" name="seeAlsoDisplayMode"  onChange="this.form.submit()" />See also</td>
+<td><input type="checkbox" name="copyrightDisplayMode"  onChange="this.form.submit()" />Copyright</td>
+</tr>
+</table>
+</form>
+Report for directory /Users/doc/Doug/Compendia/trunk/share/matlab/PlottingFiles<p>
+<strong>M-File List</strong><br/>
+<table cellspacing="0" cellpadding="2" border="0">
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FPlottingFiles%2FGuiPlotAllSignalsCompact.m'))" name="GuiPlotAllSignalsCompact"><span class="mono">GuiPlotAllSignalsCompact</span></a></td>
+<td class="td-linetopleft">
+<pre>Begin initialization code - DO NOT EDIT</pre>
+<pre>
+  Begin initialization code - DO NOT EDIT
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FPlottingFiles%2FLegendCyto.m'))" name="LegendCyto"><span class="mono">LegendCyto</span></a></td>
+<td class="td-linetopleft">
+<pre>LegendCyto is a small script to create the Legend for the Signals (phosphos)</pre>
+<pre>
+  LegendCyto is a small script to create the Legend for the Signals (phosphos)
+ 
+ 
+ --------------------------------------------------------------------------
+  INPUTS
+  
+   None
+ 
+  OUTPUTS
+ 
+   None
+ 
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  LegendCyto;
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  -
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FPlottingFiles%2FLegendSignals.m'))" name="LegendSignals"><span class="mono">LegendSignals</span></a></td>
+<td class="td-linetopleft">
+<pre>LegendSignals is a small script to create the Legend for the Signals (phosphos)</pre>
+<pre>
+  LegendSignals is a small script to create the Legend for the Signals (phosphos)
+ 
+ 
+ --------------------------------------------------------------------------
+  INPUTS
+  
+   None
+ 
+  OUTPUTS
+ 
+   None
+ 
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  LegendSignals;
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  -
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FPlottingFiles%2FPlotAllSignalsCompact.m'))" name="PlotAllSignalsCompact"><span class="mono">PlotAllSignalsCompact</span></a></td>
+<td class="td-linetopleft">
+<pre>PlotAllSignalsCompact plots a data cube in a set of subplots data</pre>
+<pre>
+  PlotAllSignalsCompact plots a data cube in a set of subplots data
+ 
+    PlotAllSignalsCompact(Labels,PlotData,BoolData,RelatData,Parameters)
+ 
+   If BoolData is provided, the plots aare filled as follows
+ 
+    green  = sustained
+    yellow = transient
+    magenta= late
+    grey   = no significant signal
+ 
+   the intensity of the fill is relative to the strength of signal
+    (relative to others for the same measurement), as provided by
+   RelatData
+ 
+ 
+ --------------------------------------------------------------------------
+  INPUTS
+   Labels          =      labels to  use for labeling the plots
+   PlotData        =      data to plot
+   BoolData(zeros) =      discretize data to define colors for plotting
+   RelatData(ones) =      relative data to define intensity of color
+  Optional Parameters (default value in parenthesis)
+      .TimeScale(1)       = 1 real, [0 1 2] else
+      .MinYMax(25)        = Minimal value for the y axis to plot
+      .ShowRed(1)         =clolours red if signals goes down
+      .Redder(0.7);       = Threshold to plot in rot
+      .CouplePlots(1;     =All plots for a particular readout are scaled together
+      .OrderMeasu([1:17]; =to change the order of the dim 5 (tipically readout) in the plot
+      .ColorModus('max'); =colouring modus:
+                           'max'    intensity related to maximal value of signal
+                                    color defined by discretized data
+                                    (green sustained [0 1 1], yellow transient [0 1 0],
+                                    magenta late [0 0 1], grey no signal [0 0 0])
+                           'change' related to change
+                                    color defined by discretized data
+                                    (green sustained [0 1 1], yellow transient [0 1 0],
+                                     magenta late [0 0 1], grey no signal [0 0 0])
+                           'refmax' related to reference treatment(compare max values), 
+                                    bigger than reference green, lower magenta
+                           'refAUC'   related to reference treatment (compare AUCs), 
+                                     bigger than reference green,  lower magenta
+                           'cytok'  Colors blue whenever it goes up
+      .Dims2Exp([3 4 5]   =defines the 3 dimensions of the data cube to loop through
+      .DimFixed([1 1]     =defines dimension not looped through and chooses a value
+      .PlotPairsOfDrugs(1 =if you plot drugs pairwise the plots will be distributed accordingly and
+                           the background will be different for each element of the pair of drugs
+      .Reference=[1 NaN NaN NaN NaN] = if there is a notNaN, the
+                           corresponding conditions are used to plot a reference signal in black
+                           e.g. in this case always plot the same data for the second cell line;
+                           can also be e.g. [ 1 NaN 1 1 NaN] then it plots
+                           the 1st cell, the 1st treatment and the 1st inhibitor
+      .Background          = if there is a reference plot, the background is coloured
+                           bluish if the (average of the ) data of interest is higher
+                           and redish if the reference is higher
+      .BackgDeactiv('noise') =condition used to define whether to plot background or not;
+                            'noise'  :if signal is below exerimental error (MinYMax) it will not be pllote
+                            'boolean':if Boolean is [ 0 0 0] it will not be plotted
+      .HeatMap('no')      =if yes, plots a heatmap in each subplot, either
+                           of the mean or a gradient through the time (see .PlotMean)
+      .PlotMean('no')     = if ploting heat map, defines whether to plot the mean or the time course
+      .PlotLumped('no')   = instead of each plot in one subfigures, it compresses all plots
+                            for different values of dim2 into a single plot
+ 
+   OUTPUTS
+ 
+   None
+ 
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  figure;PlotAllSignals(LeoData.data.Labels,LeoData.CubeNormBSA,[],[],Parameters)
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+  -
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FPlottingFiles%2FPlotCubesStructure.m'))" name="PlotCubesStructure"><span class="mono">PlotCubesStructure</span></a></td>
+<td class="td-linetopleft">
+<pre>PlotCubesStructure creates a graph with the structure of cubes included in  particular Project</pre>
+<pre>
+  PlotCubesStructure creates a graph with the structure of cubes included in  particular Project
+ 
+  the function used to create the plots is depicted between the input and output cube
+   
+   PlotCubesStructure(Project)
+ 
+ --------------------------------------------------------------------------
+  INPUTS
+   Project          =      labels to  use for labeling the plots
+   
+  OUTPUTS 
+   
+   None
+   
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+  figure;PlotCubesStructure(LeoData)
+ 
+ --------------------------------------------------------------------------
+  TODO:
+ 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FPlottingFiles%2FPlotOneCue.m'))" name="PlotOneCue"><span class="mono">PlotOneCue</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+ --------------------------------------------------------------------------
+    function PlotOneCue(Labels,PlotData,BoolData,RelatData,CellType,Cue,Parameters)
+ 
+    03/26/07 J. Saez 
+    Function to plot in a set of subplots data coloured 
+ --------------------------------------------------------------------------
+ 
+    green  = sustained
+    yellow = transient
+    magenta   = late
+    grey   = no significant signal
+ 
+  intensity related to strength of signal (relative to others for the same measurement) 
+ 
+  BoolData and RelatData are optional, e.g.
+  figure;PlotOnecue(LeoData.data.Labels,LeoData.CubeNormBSA,[],[],CellType,Cue)
+ 
+  Parameters.TimeScale=1 %real, [0 1 2] else  
+  Parameters.MinYMax=500
+  Parameters.ShowRed=1 %shows it
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FPlottingFiles%2FPlotOneSignal.m'))" name="PlotOneSignal"><span class="mono">PlotOneSignal</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+  --------------------------------------------------------------------------
+     function PlotOneSignal(Labels,PlotData,BoolData,CellType,Measurement)
+ 
+     03/26/07 J. Saez 
+     Function to plot in a set of subplots data coloured
+  --------------------------------------------------------------------------  
+ 
+    green  = sustained
+    yellow = transient
+    magenta   = late
+    grey   = no significant signal
+ 
+  intensity related to strength of signal (relative to others for the same measurement) 
+ 
+  BoolData and RelatData are optional, e.g.
+  figure;PlotOneSignal(LeoData.data.Labels,LeoData.CubeNormBSA,[],[],CellType,Measu)
+ 
+  Parameters.TimeScale=1 %1 real, [0 1 2] else  
+  Parameters.MinYMax=500
+  Parameters.ShowRed=1 %shows it
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FPlottingFiles%2FPlotRefSignalsCompact.m'))" name="PlotRefSignalsCompact"><span class="mono">PlotRefSignalsCompact</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+ --------------------------------------------------------------------------
+    function PlotRefSignalsCompact(Labels,PlotData,BoolData,RelatData,Parameters)
+ 
+    04/03/07 J. Saez
+    Function to plot on top of PlotAllSignalsCompact two reference lines
+ 
+ %--------------------------------------------------------------------------
+ 
+    green  = sustained
+    yellow = transient
+    magenta   = late
+    grey   = no significant signal
+ 
+  intensity related to strength of signal (relative to others for the same measurement)
+ 
+  BoolData and RelatData are optional, e.g.
+  figure;PlotAllSignals(LeoData.data.Labels,LeoData.CubeNormBSA,[],[],Parameters)
+ 
+  Optional parameters
+ 
+  Parameters.TimeScale=1 % 1 real, [0 1 2] else  %(default 1)
+  Parameters.MinYMax=500                      % default 25
+  Parameters.ShowRed=1 %shows it              %default 1
+  Parameters.OrderMeasu=[14 1 15 2 8 11 7 6 13 4 5 10 16 3 12 9 17];
+  Parameters.Intensity=1 2    %1 related to max;2 related to change (Jeremy's suggestion)     %default 1
+  Parameters.Dims2Exp=[3 4 5]
+  Parameters.DimFixed=[1 1]
+  Parameters.Redder=0.7;
+  Parameters.Reference=[vector1;vector2]
+  Parameters.VersionPlot=2
+  Parameters.XTransform            % function handle to a transformation to apply to X values
+  Parameters.YTransform            % function handle to a transformation to apply to Y values
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FPlottingFiles%2FPlotRelSignalsCompact.m'))" name="PlotRelSignalsCompact"><span class="mono">PlotRelSignalsCompact</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+ --------------------------------------------------------------------------
+    function PlotAllSignalsCompact(Labels,PlotData,BoolData,RelatData,Parameters)
+ 
+    04/03/07 J. Saez
+    Function to plot in a set of subplots data coloured, compacted to save
+    space, no labels though
+ --------------------------------------------------------------------------
+ 
+    green  = sustained
+    yellow = transient
+    magenta   = late
+    grey   = no significant signal
+ 
+  intensity related to strength of signal (relative to others for the same measurement)
+ 
+  BoolData and RelatData are optional, e.g.
+  figure;PlotAllSignals(LeoData.data.Labels,LeoData.CubeNormBSA,[],[],Parameters)
+ 
+  Optional parameters
+ 
+  Parameters.TimeScale=1 % 1 real, [0 1 2] else  %(default 1)
+  Parameters.MinYMax=500                      % default 25
+  Parameters.ShowRed=1 %shows it              %default 1
+  Parameters.OrderMeasu=[14 1 15 2 8 11 7 6 13 4 5 10 16 3 12 9 17];
+  Parameters.Intensity=1 2    %1 related to max;2 related to change (Jeremy's suggestion)     %default 1
+  Parameters.Dims2Exp=[3 4 5]
+  Parameters.DimFixed=[1 1]
+  Parameters.Redder=0.7;
+  Parameters.CouplePlots=1;
+  Parameters.Consistency=0.95;
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FPlottingFiles%2Frotateticklabel.m'))" name="rotateticklabel"><span class="mono">rotateticklabel</span></a></td>
+<td class="td-linetopleft">
+<pre>ROTATETICKLABEL rotates tick labels</pre>
+<pre>
+ ROTATETICKLABEL rotates tick labels
+    TH=ROTATETICKLABEL(H,ROT) is the calling form where H is a handle to
+    the axis that contains the XTickLabels that are to be rotated. ROT is
+    an optional parameter that specifies the angle of rotation. The default
+    angle is 90. TH is a handle to the text objects created. For long
+    strings such as those produced by datetick, you may have to adjust the
+    position of the axes so the labels don't get cut off.
+ 
+    Of course, GCA can be substituted for H if desired.
+ 
+    TH=ROTATETICKLABEL([],[],'demo') shows a demo figure.
+ 
+    Known deficiencies: if tick labels are raised to a power, the power
+    will be lost after rotation.
+ 
+    See also datetick.
+<br/>
+</pre>
+</td></tr>
+</table>
+</body></html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /><link rel="stylesheet" href="file:////Applications/MATLAB74/toolbox/matlab/codetools/matlab-report-styles.css" type="text/css" />
+<title>Help Report</title>
+</head>
+<body>
+<div class="report-head">Help Report</div><p>
+<table border="0">
+<tr><td><form method="post" action="matlab:visdirrefresh">
+<input type="submit" value="Rerun This Report" />
+<input type="hidden" name="reporttype" value="helprpt" />
+<input type="hidden" name="option" value="dir" />
+<input type="hidden" name="name" value="/Users/doc/Doug/Compendia/trunk/share/matlab/MultReg" />
+</form></td>
+<td><form method="post" action="matlab:visdirrefresh">
+<input type="submit" value="Run Report on Current Directory" />
+<input type="hidden" name="reporttype" value="helprpt" />
+</form></td></tr>
+</table>
+<form method="post" action="matlab:visdirformhandler">
+<input type="hidden" name="reporttype" value="helprpt" />
+<table cellspacing="8">
+<tr>
+<td><input type="checkbox" name="helpSubfunsDisplayMode"  onChange="this.form.submit()" />Show subfunctions</td>
+<td><input type="checkbox" name="h1DisplayMode" checked onChange="this.form.submit()" />Description</td>
+<td><input type="checkbox" name="exampleDisplayMode"  onChange="this.form.submit()" />Examples</td>
+</tr><tr>
+<td><input type="checkbox" name="helpDisplayMode" checked onChange="this.form.submit()" />Show all help</td>
+<td><input type="checkbox" name="seeAlsoDisplayMode"  onChange="this.form.submit()" />See also</td>
+<td><input type="checkbox" name="copyrightDisplayMode"  onChange="this.form.submit()" />Copyright</td>
+</tr>
+</table>
+</form>
+Report for directory /Users/doc/Doug/Compendia/trunk/share/matlab/MultReg<p>
+<strong>M-File List</strong><br/>
+<table cellspacing="0" cellpadding="2" border="0">
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FMultReg%2FGetMatrices4Reg.m'))" name="GetMatrices4Reg"><span class="mono">GetMatrices4Reg</span></a></td>
+<td class="td-linetopleft">
+<pre>GetMatrices4Reg expands the cube into 2D matrices for the linear regression analysis</pre>
+<pre>
+  GetMatrices4Reg expands the cube into 2D matrices for the linear regression analysis
+ ----------------------------------------------------------------------------------
+   
+    function Res=GetMatrices4Reg(PhosphoData,CytoData,cell)
+ 
+    04/20/07 J. Saez
+    Function to expand the cube into 2D matrices for the linear regression analysis
+ 
+ -----------------------------------------------------------------------------------
+   
+ 
+  -------Parameters------
+ 
+  Parameters.DimFixed=[1 1]
+  Parameters.dim2={'EGF,','TGF',...}
+  Parameters.dim3={'PI3Ki'} with or without i
+  Parameters.MetricPhospho can be 'mean', 'AUC', or 'Differential'
+  Parameters.MetricCyto can be 'mean', 'AUC', or 'Slope'
+ 
+ --------------------------
+   e.g.
+  Res=GetOptMatrices(LeoData.data(3),LeoDataCyto.data(2),Parameters);
+ 
+   Res:
+          CueNames: {10x1 cell}
+          InhNames: {7x1 cell}
+      PhosphoNames: {17x1 cell}
+         CytoNames: {17x1 cell}
+        CytoMatrix: [88x17 double]
+         InhMatrix: [88x7 double]
+      CueInhMatrix: [88x17 double]
+     ScenarioNames: {1x88 cell}
+     PhosphoMatrix: [88x17 double]
+         CueMatrix: [88x10 double]
+ 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FMultReg%2FGetOptimFun.m'))" name="GetOptimFun"><span class="mono">GetOptimFun</span></a></td>
+<td class="td-linetopleft">
+<pre>----------------------------------------------------------------------------------</pre>
+<pre>
+ 
+ ----------------------------------------------------------------------------------
+   
+    function Fit=GetOptimFun(PhosphoMatrix,CytoMatrix,WMatrix)
+ 
+    04/20/07 J. Saez
+    Function to compute the least-squares error of the linear regression
+ 
+ -----------------------------------------------------------------------------------
+   
+   
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FMultReg%2FGetWeightMatrix.m'))" name="GetWeightMatrix"><span class="mono">GetWeightMatrix</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+ --------------------------------------------------------------------------
+   
+  function WeightMatrix=GetWeightMatrix(YMatrix,XMatrix)
+   
+    04/22/07 J. Saez
+    Function to compute the WeightMatrix for linear regression fo the form
+    YMatrix=XMatrix*WeightMatrix
+ 
+   for now includes only simplye the mldivide command from matlab
+ 
+ --------------------------------------------------------------------------
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FMultReg%2FPlotComparedWeights.m'))" name="PlotComparedWeights"><span class="mono">PlotComparedWeights</span></a></td>
+<td class="td-linetopleft">
+<span style="background: #FFC0C0">No description line</span><br/>
+<span style="background: #FFC0C0">No help</span><br/>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FMultReg%2FPlotFitRegression.m'))" name="PlotFitRegression"><span class="mono">PlotFitRegression</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+ --------------------------------------------------------------------------
+  function PlotFitRegression(PhosphoMatrix,CytoMatrix,WMatrix)
+ 
+    20/19/07 J. Saez
+    Function to plot the fit of a regression Cy=Ph*W
+ 
+ --------------------------------------------------------------------------
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FMultReg%2FPlotTotalFit.m'))" name="PlotTotalFit"><span class="mono">PlotTotalFit</span></a></td>
+<td class="td-linetopleft">
+<pre>----------------------------------------------------------------------------------</pre>
+<pre>
+ 
+ ----------------------------------------------------------------------------------
+   
+    function  PLotTotalFit(PhosphoMatrix,CytoMatrix,WMatrix)
+ 
+    04/20/07 J. Saez
+    Function to plot the total fit 
+ 
+ -----------------------------------------------------------------------------------
+   
+   
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FMultReg%2FPlotWeights.m'))" name="PlotWeights"><span class="mono">PlotWeights</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+ --------------------------------------------------------------------------
+  function PlotWeights(WMatrix,LabelsY,LabelsX)
+ 
+    04/22/07 J. Saez
+    Function to plot the weights of the matrix W in a regression Cy=Ph*W
+ 
+ --------------------------------------------------------------------------
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FMultReg%2Fcolorplotdata.m'))" name="colorplotdata"><span class="mono">colorplotdata</span></a></td>
+<td class="td-linetopleft">
+<pre>This function is using the pcolor command and adds zeros at the end of the</pre>
+<pre>
+ This function is using the pcolor command and adds zeros at the end of the
+ matrix in order the matrix to be plotted consistently
+<br/>
+</pre>
+</td></tr>
+</table>
+</body></html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /><link rel="stylesheet" href="file:////Applications/MATLAB74/toolbox/matlab/codetools/matlab-report-styles.css" type="text/css" />
+<title>Help Report</title>
+</head>
+<body>
+<div class="report-head">Help Report</div><p>
+<table border="0">
+<tr><td><form method="post" action="matlab:visdirrefresh">
+<input type="submit" value="Rerun This Report" />
+<input type="hidden" name="reporttype" value="helprpt" />
+<input type="hidden" name="option" value="dir" />
+<input type="hidden" name="name" value="/Users/doc/Doug/Compendia/trunk/share/matlab/help" />
+</form></td>
+<td><form method="post" action="matlab:visdirrefresh">
+<input type="submit" value="Run Report on Current Directory" />
+<input type="hidden" name="reporttype" value="helprpt" />
+</form></td></tr>
+</table>
+<form method="post" action="matlab:visdirformhandler">
+<input type="hidden" name="reporttype" value="helprpt" />
+<table cellspacing="8">
+<tr>
+<td><input type="checkbox" name="helpSubfunsDisplayMode"  onChange="this.form.submit()" />Show subfunctions</td>
+<td><input type="checkbox" name="h1DisplayMode" checked onChange="this.form.submit()" />Description</td>
+<td><input type="checkbox" name="exampleDisplayMode"  onChange="this.form.submit()" />Examples</td>
+</tr><tr>
+<td><input type="checkbox" name="helpDisplayMode" checked onChange="this.form.submit()" />Show all help</td>
+<td><input type="checkbox" name="seeAlsoDisplayMode"  onChange="this.form.submit()" />See also</td>
+<td><input type="checkbox" name="copyrightDisplayMode"  onChange="this.form.submit()" />Copyright</td>
+</tr>
+</table>
+</form>
+Report for directory /Users/doc/Doug/Compendia/trunk/share/matlab/help<p>
+<strong>M-File List</strong><br/>
+<table cellspacing="0" cellpadding="2" border="0">
+</table>
+</body></html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /><link rel="stylesheet" href="file:////Applications/MATLAB74/toolbox/matlab/codetools/matlab-report-styles.css" type="text/css" />
+<title>Help Report</title>
+</head>
+<body>
+<div class="report-head">Help Report</div><p>
+<table border="0">
+<tr><td><form method="post" action="matlab:visdirrefresh">
+<input type="submit" value="Rerun This Report" />
+<input type="hidden" name="reporttype" value="helprpt" />
+<input type="hidden" name="option" value="dir" />
+<input type="hidden" name="name" value="/Users/doc/Doug/Compendia/trunk/share/matlab/BooleanAnalysis/ProcessingFiles" />
+</form></td>
+<td><form method="post" action="matlab:visdirrefresh">
+<input type="submit" value="Run Report on Current Directory" />
+<input type="hidden" name="reporttype" value="helprpt" />
+</form></td></tr>
+</table>
+<form method="post" action="matlab:visdirformhandler">
+<input type="hidden" name="reporttype" value="helprpt" />
+<table cellspacing="8">
+<tr>
+<td><input type="checkbox" name="helpSubfunsDisplayMode"  onChange="this.form.submit()" />Show subfunctions</td>
+<td><input type="checkbox" name="h1DisplayMode" checked onChange="this.form.submit()" />Description</td>
+<td><input type="checkbox" name="exampleDisplayMode"  onChange="this.form.submit()" />Examples</td>
+</tr><tr>
+<td><input type="checkbox" name="helpDisplayMode" checked onChange="this.form.submit()" />Show all help</td>
+<td><input type="checkbox" name="seeAlsoDisplayMode"  onChange="this.form.submit()" />See also</td>
+<td><input type="checkbox" name="copyrightDisplayMode"  onChange="this.form.submit()" />Copyright</td>
+</tr>
+</table>
+</form>
+Report for directory /Users/doc/Doug/Compendia/trunk/share/matlab/BooleanAnalysis/ProcessingFiles<p>
+<strong>M-File List</strong><br/>
+<table cellspacing="0" cellpadding="2" border="0">
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FCreateCNAData.m'))" name="CreateCNAData"><span class="mono">CreateCNAData</span></a></td>
+<td class="td-linetopleft">
+<pre>**************************************************************************</pre>
+<pre>
+ 
+ **************************************************************************
+ 
+    function Res=CreateCNAData(CubeBoolean,Parameters)
+ 
+    04/03/07 J. Saez
+    Converts Cube of Boolean Data into CellNetAnalyzer Format
+ 
+    WARNING: Works only on the canonical form
+ 
+    Parameters.DimFixed=[1 1]
+    Parameters.Labels=Labels
+    Parameters.dim2={'EGF,','TGF',...}
+    Parameters.dim3={'PI3Ki'} with or without i
+ 
+ --------------------------------------------------------------------------
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FGetDifference.m'))" name="GetDifference"><span class="mono">GetDifference</span></a></td>
+<td class="td-linetopleft">
+<pre>function NewData=GetDiference(OldData,RefCell)</pre>
+<pre>
+ 
+  function NewData=GetDiference(OldData,RefCell)
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FGetEffectCue.m'))" name="GetEffectCue"><span class="mono">GetEffectCue</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+ --------------------------------------------------------------------------
+   
+ NewData=GetEffectCue(OldData,Parameters)
+ 
+  Computes the effect of a cue relative to the absence of the cue (=DMSO)
+   
+ -------------------------------------------------------------------------- 
+  
+   
+  Parameters.NonCueNumber=1;
+  Parameters.MinSignal=10;
+  
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FGetEffectInhibitor.m'))" name="GetEffectInhibitor"><span class="mono">GetEffectInhibitor</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+ --------------------------------------------------------------------------
+ 
+   NewData=GetEffectInhibitor(OldData,Parameters)
+ 
+   04/22/07 J. Saez
+   Computes the effect of an inihibitor relative to the absence of inhibitor
+ --------------------------------------------------------------------------
+   
+  Parameters.NonInhibitorNumber=`;
+  Parameters.MinSignal=10;
+  
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FGetExpDepMat.m'))" name="GetExpDepMat"><span class="mono">GetExpDepMat</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ --------------------------------------------------------------------------
+ 
+  function ExpDepMat=GetExpDepMat(NetEffectInhibitor,Parameters)
+ 
+    04/03/07 J. Saez
+  returns a 2D matrix with a classification according to Parameter.Threshold (inhibitor, activator, unclear)
+ 
+ --------------------------------------------------------------------------
+ 
+ 
+   Parameters.Threshold, e.g. 0.5;
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FGetFitNetwork.m'))" name="GetFitNetwork"><span class="mono">GetFitNetwork</span></a></td>
+<td class="td-linetopleft">
+<pre>function score=GetFitNetworkLogic(reacDefault)</pre>
+<pre>
+ 
+   function score=GetFitNetworkLogic(reacDefault)
+ 
+   08/15/07 J. Saez
+ 
+   function to be called by optimizer; considers both dependency matrix and
+   logical scenarios
+ 
+  Parameters to be passed via DataProject
+ 
+ Parameters.maxout=10;    % wenn maxout z.B. 10 ist, dann werden nach der Berechnung die
+                          % besten 10 Net zkandidaten am Bildschirm ausgegeben.
+ Parameters.ts=1;         % time scale für Berechnung der dependency matrix
+ Parameters.maxSet=3;     % maximale Anzahl zu kombinierender Kanten
+ Parameters.nanfac=0.001; % ist der FAKTor für die gewichtung von NaN
+ Parameters.setdefault=1; % ob die Default-Werte gesetzt werden sollen (0/1)
+ 
+  TODO
+  -See why it provides different values as GetFitNetwork
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FGetFitNetworkLogic.m'))" name="GetFitNetworkLogic"><span class="mono">GetFitNetworkLogic</span></a></td>
+<td class="td-linetopleft">
+<pre>function score=GetFitNetworkLogic(reacDefault)</pre>
+<pre>
+ 
+   function score=GetFitNetworkLogic(reacDefault)
+ 
+   08/15/07 J. Saez
+ 
+   function to be called by optimizer considers only logical scenarios
+ 
+  Parameters to be passed via DataProject
+ 
+ Parameters.maxout=10;     % wenn maxout z.B. 10 ist, dann werden nach der Berechnung die
+                           % besten 10 Net zkandidaten am Bildschirm ausgegeben.
+  Parameters.ts=1;         % time scale für Berechnung der dependency matrix
+  Parameters.maxSet=3;     % maximale Anzahl zu kombinierender Kanten
+  Parameters.nanfac=0.001; % ist der FAKTor für die gewichtung von NaN
+  Parameters.setdefault=1; % ob die Default-Werte gesetzt werden sollen (0/1)
+  Parameters.sizefac=0;    % factor to weight the number of reactions
+  considered in the objective fuction
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FGetFitThresholds.m'))" name="GetFitThresholds"><span class="mono">GetFitThresholds</span></a></td>
+<td class="td-linetopleft">
+<pre>function idf=GetFitParams(para)</pre>
+<pre>
+ 
+  function idf=GetFitParams(para)
+ 
+  Takes data CubeBool and CubeCNA (globals)
+ 
+   and adjust the threshols parameters and gives the fit to data
+    
+ 
+  Parameters ={'SigniPeak' 'SigniDec' 'ThreshMax' 'MinSignal'}
+  Para
+  
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FGetNetEffect.m'))" name="GetNetEffect"><span class="mono">GetNetEffect</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+ --------------------------------------------------------------------------
+ function NetEffect=GetNetEffectInhibitor(EffectData,Parameters)
+ 
+    04/18/07 J. Saez
+  returns a 2D matrix from the 5D 
+  with the net effect of each inhibitable protein on each signal
+  for a particular cell Parameters(1).Name='CellType'
+ --------------------------------------------------------------------------
+   
+  Parameters.CellType='HepG2'
+  Parameters(2).Name='LabelsCells'
+  Parameters.LabelsCells=Labels(5)
+  Parameters(3).Name='TimeScales'
+  Parameters.TimeScales=[1 2 3] %Time scales considered
+  Parameters(4).Name='Perturbator': dimension of perturbation 
+ 3 Cue,  4:inhibitor
+  Parameters.Perturbator=3
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FGetStructure.m'))" name="GetStructure"><span class="mono">GetStructure</span></a></td>
+<td class="td-linetopleft">
+<pre>GetStructure finds the optimal sub-network to maximize the fit to the data of a Boolean network</pre>
+<pre>
+  GetStructure finds the optimal sub-network to maximize the fit to the data of a Boolean network
+ 
+  Res= GetStructure(DataProject,Parameters)
+ 
+ 
+  It uses CellNetAnalyzer  (http://www.mpi-magdeburg.mpg.de/projects/cna/cna.html)
+  to compute the fit to the data
+ 
+  Different optimization algorithms can be chosen (see below)
+ 
+   Currently it simply switches off reactions (hyperarcs)
+    **SOON** it will also check to split ANDs into ORs 
+    and switch off particular branches of ANDs
+ 
+ --------------------------------------------------------------------------
+  INPUTS:
+  InputProject = a DataCube created to import to CNA (using createCNAdata)
+  and (optionally) the following parameters
+  parameters = optional structure of parameters
+             .nanfac=0.001;    : weight in the optimum function for the NaNs 
+             .sizefac=0.0;     : weight in the optimum function
+                               : for the number of hyperarcs (reactions)
+             .Optimizer='SA';  : optimization algorithm 
+                               : SA: Simulated Annealing (from SBTOOLBOX)
+                               : EA: Evolutionary Algorithm (from J. Stelling )%                         
+             .maxtime = 1*60;  : Maximum time (in minutes) for optimization
+  
+ 
+  OUTPUTS:
+ Res = 
+  
+                     Params: actual parameters used in optimization
+            NumReacsRemoved: number of reactions removed
+               NumReacsKept: number of reactions kept
+              ReactionsKept: names  of reactions kept
+           ReactionsRemoved: names  of reactions removed
+      ReactionsNotAffecting: names of reactions with no effect on readouts
+                             (and thus not considered in the optimization)
+           ReactionsOutputs: names of output reactions 
+                             (not considered in the optimization)
+            ReactionsInputs: names of input reactions 
+                             (not considered in the optimization)
+ 
+ --------------------------------------------------------------------------
+  EXAMPLE:
+ 
+  LeoData.data(v.FindStrPrim).Value=GetStructure(DataProject,FitParameters)
+ 
+  or using createDataCube
+ 
+ cub=numel(LeoData.data)+1;
+   LeoData.data(cub)=createDataCube(...
+          'Name', 'OptimNetw1' , ...
+          'Info', 'Optimized Network', ...
+          'Code', @GetStructure, ...
+          'Parameters', {'nanfac', 0.001,...
+                         'sizefac',0,...
+                         'Model','HepatHMS',...
+                         'maxtime',.1,...
+                         'Optimizer','SA'},...
+          'SourceData', LeoData.data(LeoData.c.CNAPrim));
+    eval(['LeoData.v.' LeoData.data(cub).Name '=' num2str(cub) ';']);
+ 
+ --------------------------------------------------------------------------
+  TODO:
+  - Add GA: Genetic Algorithm (from Bioinformatics Toolbox) and 
+     SA from Stefan Gayer
+ 
+  - check to split ANDs into ORs and switch off particular branches of ANDs
+ 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FIdentifyNetwork.m'))" name="IdentifyNetwork"><span class="mono">IdentifyNetwork</span></a></td>
+<td class="td-linetopleft">
+<pre>function Project=IdentifyNetwork(Project,Parameters)</pre>
+<pre>
+ 
+   function Project=IdentifyNetwork(Project,Parameters)
+   
+   05/27/07 J. Saez
+   adapts  identify_network to the dataflox structure
+ 
+ Parameters.maxout=10;    % wenn maxout z.B. 10 ist, dann werden nach der Berechnung die
+                          % besten 10 Net zkandidaten am Bildschirm ausgegeben.
+ Parameters.ts=1;         % time scale für Berechnung der dependency matrix
+ Parameters.maxSet=3;     % maximale Anzahl zu kombinierender Kanten
+ Parameters.nanfac=0.001; % ist der FAKTor für die gewichtung von NaN
+ Parameters.setdefault=1; % ob die Default-Werte gesetzt werden sollen (0/1)
+ Parameters.reacDefault   % vector [0, 1,NaN], 
+ Parameters.specDefault   % vector [0, 1,NaN], 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FImportCNAResults.m'))" name="ImportCNAResults"><span class="mono">ImportCNAResults</span></a></td>
+<td class="td-linetopleft">
+<pre>**************************************************************************</pre>
+<pre>
+ 
+ **************************************************************************
+ 
+    function CNAResCube=ImportCNAResults(CubeBoolean,ValueHepG2,ValuePrim)
+ 
+    05/02/07 J. Saez 
+    Reconverts CellNetAnalyzer results into Hypercube
+ 
+ --------------------------------------------------------------------------
+ 
+    Very specific for Leo's data structure...
+   
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FPlotDepMat.m'))" name="PlotDepMat"><span class="mono">PlotDepMat</span></a></td>
+<td class="td-linetopleft">
+<pre>function PlotDepMat(NetEffectData,Labels)</pre>
+<pre>
+   
+   function PlotDepMat(NetEffectData,Labels)
+ 
+   Not working!!!
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FPlotEffectPerturbations.m'))" name="PlotEffectPerturbations"><span class="mono">PlotEffectPerturbations</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+ --------------------------------------------------------------------------
+ function PlotEffectPerturbations(EffectData,LabelsInputs,LabelsOutputs,TypePlot)
+ 
+    04/23/07 J. Saez 
+ 
+    Function to plot the effect of perturbations on signals
+ --------------------------------------------------------------------------
+ 
+ 
+    e.g.    PlotEffectInhibitor(LeoData.data(8).Value.Mean,LeoData.data.Labels,0)
+ 
+   TypePlot: 1 heat map (colouring not adjusted)
+         rest: bars
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FPlotFitAllSignals.m'))" name="PlotFitAllSignals"><span class="mono">PlotFitAllSignals</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+ --------------------------------------------------------------------------
+    function PlotAllSignalsCompact(Labels,PlotData,BoolData,RelatData,CNAData,CellType,Parameters)
+ 
+    04/03/07 J. Saez
+    Function to plot in a set of subplots data coloured, compacted to save
+    space, no labels though
+ --------------------------------------------------------------------------
+ 
+    green  = sustained
+    yellow = transient
+    magenta   = late
+    grey   = no significant signal
+ 
+  intensity related to strength of signal (relative to others for the same measurement)
+ 
+  BoolData and RelatData are optional, e.g.
+  figure;PlotAllSignals(LeoData.data.Labels,LeoData.CubeNormBSA,[],[],CellType)
+ 
+  Optional parameters
+   
+  Parameters.TimeScale=1 %real, [0 1 2] else  %(default 1)
+  Parameters.MinYMax=500                      % default 25
+  Parameters.ShowRed=1 %shows it              %default 1
+  Parameters.OrderMeasu=[14 1 15 2 8 11 7 6 13 4 5 10 16 3 12 9 17];
+  Parameters.Intensity=1 2    %1 related to max;2 related to change (Jeremy's suggestion)     %default 1
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FPlotHistEffect.m'))" name="PlotHistEffect"><span class="mono">PlotHistEffect</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+ --------------------------------------------------------------------------
+  function PlotHistEffect(EffectInhibitor,Labels,CellType)
+ 
+    04/19/07 J. Saez
+    Function to plot in multiple histograms the effect of multiple inhibitors
+ 
+ --------------------------------------------------------------------------
+ 
+  e.g. ;PlotHistEffect(LeoData.data(v.EffectInh).Value,LeoData.data.Labels,'Primary')
+ 
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FPlotHistEffectCue.m'))" name="PlotHistEffectCue"><span class="mono">PlotHistEffectCue</span></a></td>
+<td class="td-linetopleft">
+<pre>--------------------------------------------------------------------------</pre>
+<pre>
+ 
+ --------------------------------------------------------------------------
+  function PlotHistEffect(EffectCue,Labels,CellType)
+ 
+    04/19/07 J. Saez
+    Function to plot in multiple histograms the effect of multiple inhibitors
+ 
+ --------------------------------------------------------------------------
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2FPreGetFitProcess.m'))" name="PreGetFitProcess"><span class="mono">PreGetFitProcess</span></a></td>
+<td class="td-linetopleft">
+<pre>Preprocessing to be done before running the GetFitNetworkLogic</pre>
+<pre>
+ 
+  Preprocessing to be done before running the GetFitNetworkLogic
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2Fscen_auto_silent.m'))" name="scen_auto_silent"><span class="mono">scen_auto_silent</span></a></td>
+<td class="td-linetopleft">
+<pre>function that computes the logical steady states of a set of scenarios </pre>
+<pre>
+  function that computes the logical steady states of a set of scenarios 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FProcessingFiles%2Fscen_compare_silent.m'))" name="scen_compare_silent"><span class="mono">scen_compare_silent</span></a></td>
+<td class="td-linetopleft">
+<pre>function that compares the calculated steady states of all scenarios with given values  </pre>
+<pre>
+  function that compares the calculated steady states of all scenarios with given values  
+<br/>
+</pre>
+</td></tr>
+</table>
+</body></html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /><link rel="stylesheet" href="file:////Applications/MATLAB74/toolbox/matlab/codetools/matlab-report-styles.css" type="text/css" />
+<title>Help Report</title>
+</head>
+<body>
+<div class="report-head">Help Report</div><p>
+<table border="0">
+<tr><td><form method="post" action="matlab:visdirrefresh">
+<input type="submit" value="Rerun This Report" />
+<input type="hidden" name="reporttype" value="helprpt" />
+<input type="hidden" name="option" value="dir" />
+<input type="hidden" name="name" value="/Users/doc/Doug/Compendia/trunk/share/matlab/BooleanAnalysis/CNA" />
+</form></td>
+<td><form method="post" action="matlab:visdirrefresh">
+<input type="submit" value="Run Report on Current Directory" />
+<input type="hidden" name="reporttype" value="helprpt" />
+</form></td></tr>
+</table>
+<form method="post" action="matlab:visdirformhandler">
+<input type="hidden" name="reporttype" value="helprpt" />
+<table cellspacing="8">
+<tr>
+<td><input type="checkbox" name="helpSubfunsDisplayMode"  onChange="this.form.submit()" />Show subfunctions</td>
+<td><input type="checkbox" name="h1DisplayMode" checked onChange="this.form.submit()" />Description</td>
+<td><input type="checkbox" name="exampleDisplayMode"  onChange="this.form.submit()" />Examples</td>
+</tr><tr>
+<td><input type="checkbox" name="helpDisplayMode" checked onChange="this.form.submit()" />Show all help</td>
+<td><input type="checkbox" name="seeAlsoDisplayMode"  onChange="this.form.submit()" />See also</td>
+<td><input type="checkbox" name="copyrightDisplayMode"  onChange="this.form.submit()" />Copyright</td>
+</tr>
+</table>
+</form>
+Report for directory /Users/doc/Doug/Compendia/trunk/share/matlab/BooleanAnalysis/CNA<p>
+<strong>M-File List</strong><br/>
+<table cellspacing="0" cellpadding="2" border="0">
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FCNA%2Fcells_compare.m'))" name="cells_compare"><span class="mono">cells_compare</span></a></td>
+<td class="td-linetopleft">
+<pre>J. Saez modified version of scen_compare to compare the results for 2</pre>
+<pre>
+ 
+  J. Saez modified version of scen_compare to compare the results for 2
+  different cells
+ 
+  function that compares the calculated steady states of all scenarios with given values  
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FCNA%2Fdepmat_compare.m'))" name="depmat_compare"><span class="mono">depmat_compare</span></a></td>
+<td class="td-linetopleft">
+<pre>function that compares the experimental dependency matrix with the computed dependency</pre>
+<pre>
+  function that compares the experimental dependency matrix with the computed dependency
+  matrix of the model
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FCNA%2Fdepmat_compare_legend.m'))" name="depmat_compare_legend"><span class="mono">depmat_compare_legend</span></a></td>
+<td class="td-linetopleft">
+<pre>idx=[6 5 4 12 11 10 9 8 7 3 2 1];</pre>
+<pre>
+ idx=[6 5 4 12 11 10 9 8 7 3 2 1];
+ yaxnames=yaxnames(idx,:);
+ xaxnames=xaxnames(idx,:);
+ mat=mat(idx,idx);
+  Plot: Positionierungen, Achsen
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FCNA%2Fidentify_network.m'))" name="identify_network"><span class="mono">identify_network</span></a></td>
+<td class="td-linetopleft">
+<pre>CellNetAnalyzer:  Algorithm for signal-flow networks that tests systematically all </pre>
+<pre>
+ % CellNetAnalyzer:  Algorithm for signal-flow networks that tests systematically all 
+ %%		      combinations of (marked) candidate interactions and identifies the 
+ %%		      network structure fitting best a set of given expertimental data
+ %%		      
+ %% Steffen Klamt, 06/2007
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FCNA%2Finter_init_noui.m'))" name="inter_init_noui"><span class="mono">inter_init_noui</span></a></td>
+<td class="td-linetopleft">
+<pre>Steffen Klamt,  MPI "Dynamik komplexer technischer Systeme" Magdeburg</pre>
+<pre>
+  Steffen Klamt,  MPI "Dynamik komplexer technischer Systeme" Magdeburg
+  Einlesen der benoetigten Matrizen und Vektoren
+  Vorinitialiserug der Grafiken
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FCNA%2Fnormalize_flux.m'))" name="normalize_flux"><span class="mono">normalize_flux</span></a></td>
+<td class="td-linetopleft">
+<span style="background: #FFC0C0">No description line</span><br/>
+<span style="background: #FFC0C0">No help</span><br/>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FCNA%2Fplotdistance.m'))" name="plotdistance"><span class="mono">plotdistance</span></a></td>
+<td class="td-linetopleft">
+<pre>Funktion  : plotdistance.m</pre>
+<pre>
+  Funktion  : plotdistance.m
+ 
+  Aufgabe   : Plot Matrix farbig
+ 
+  Aufruf    : plotdistance(xnames,ynames,dist,{optionen})
+ 
+  Parameter : xnames  = 	Namen fuer x-achse    [string array]
+  		ynames  = 	Namen fuer x-achse    [string array]
+              dist             = Abstandsmasse [matrix]
+              
+  Optionen  : 'HalfMatrix'     = Darstellung halbe Matrix            
+              {'DiscSteps',n}  = Anzahl Diskretisierungsschritte (2&lt;=n&lt;=256)
+              {'ColMap',s}   = Auswahl Colormap s= {Standard Matlab,'redgreen'}
+              {'FontSize',n}   = Schriftgroesse in pt (5&lt;=n&lt;=12)
+              
+  Ausgabe   : Index            = Indexvektoren dist -&gt; Enzyme [optional]
+ 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FCNA%2Fplotmatcol_comp.m'))" name="plotmatcol_comp"><span class="mono">plotmatcol_comp</span></a></td>
+<td class="td-linetopleft">
+<pre>05/02/07 J. Saez modified version of plotmatcol_scen to plot the differences</pre>
+<pre>
+ 
+  05/02/07 J. Saez modified version of plotmatcol_scen to plot the differences
+                   between 2 cell types
+ 
+ idx=[6 5 4 12 11 10 9 8 7 3 2 1];
+ yaxnames=yaxnames(idx,:);
+ xaxnames=xaxnames(idx,:);
+ mat=mat(idx,idx);
+  Plot: Positionierungen, Achsen
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FCNA%2Fplotmatcol_new.m'))" name="plotmatcol_new"><span class="mono">plotmatcol_new</span></a></td>
+<td class="td-linetopleft">
+<pre>idx=[6 5 4 12 11 10 9 8 7 3 2 1];</pre>
+<pre>
+ idx=[6 5 4 12 11 10 9 8 7 3 2 1];
+ yaxnames=yaxnames(idx,:);
+ xaxnames=xaxnames(idx,:);
+ mat=mat(idx,idx);
+  Plot: Positionierungen, Achsen
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FCNA%2Fplotmatcol_scen.m'))" name="plotmatcol_scen"><span class="mono">plotmatcol_scen</span></a></td>
+<td class="td-linetopleft">
+<pre>idx=[6 5 4 12 11 10 9 8 7 3 2 1];</pre>
+<pre>
+ idx=[6 5 4 12 11 10 9 8 7 3 2 1];
+ yaxnames=yaxnames(idx,:);
+ xaxnames=xaxnames(idx,:);
+ mat=mat(idx,idx);
+  Plot: Positionierungen, Achsen
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FCNA%2Frobustness_analysis.m'))" name="robustness_analysis"><span class="mono">robustness_analysis</span></a></td>
+<td class="td-linetopleft">
+<pre>CellNetAnalyzer:  Robustness analysis in signal-flow networks</pre>
+<pre>
+ % CellNetAnalyzer:  Robustness analysis in signal-flow networks
+ %%		      Systematic knock-outs of species and interactions
+ %%  		      and check how the eoriginal behavior (predictions) change
+ %%  Steffen Klamt, 06/2007
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FCNA%2Fscen_auto.m'))" name="scen_auto"><span class="mono">scen_auto</span></a></td>
+<td class="td-linetopleft">
+<pre>function that computes the logical steady states of a set of scenarios </pre>
+<pre>
+  function that computes the logical steady states of a set of scenarios 
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FBooleanAnalysis%2FCNA%2Fscen_compare.m'))" name="scen_compare"><span class="mono">scen_compare</span></a></td>
+<td class="td-linetopleft">
+<pre>function that compares the calculated steady states of all scenarios with given values  </pre>
+<pre>
+  function that compares the calculated steady states of all scenarios with given values  
+<br/>
+</pre>
+</td></tr>
+</table>
+</body></html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /><link rel="stylesheet" href="file:////Applications/MATLAB74/toolbox/matlab/codetools/matlab-report-styles.css" type="text/css" />
+<title>Help Report</title>
+</head>
+<body>
+<div class="report-head">Help Report</div><p>
+<table border="0">
+<tr><td><form method="post" action="matlab:visdirrefresh">
+<input type="submit" value="Rerun This Report" />
+<input type="hidden" name="reporttype" value="helprpt" />
+<input type="hidden" name="option" value="dir" />
+<input type="hidden" name="name" value="/Users/doc/Doug/Compendia/trunk/share/matlab/DataClasses" />
+</form></td>
+<td><form method="post" action="matlab:visdirrefresh">
+<input type="submit" value="Run Report on Current Directory" />
+<input type="hidden" name="reporttype" value="helprpt" />
+</form></td></tr>
+</table>
+<form method="post" action="matlab:visdirformhandler">
+<input type="hidden" name="reporttype" value="helprpt" />
+<table cellspacing="8">
+<tr>
+<td><input type="checkbox" name="helpSubfunsDisplayMode"  onChange="this.form.submit()" />Show subfunctions</td>
+<td><input type="checkbox" name="h1DisplayMode" checked onChange="this.form.submit()" />Description</td>
+<td><input type="checkbox" name="exampleDisplayMode"  onChange="this.form.submit()" />Examples</td>
+</tr><tr>
+<td><input type="checkbox" name="helpDisplayMode" checked onChange="this.form.submit()" />Show all help</td>
+<td><input type="checkbox" name="seeAlsoDisplayMode"  onChange="this.form.submit()" />See also</td>
+<td><input type="checkbox" name="copyrightDisplayMode"  onChange="this.form.submit()" />Copyright</td>
+</tr>
+</table>
+</form>
+Report for directory /Users/doc/Doug/Compendia/trunk/share/matlab/DataClasses<p>
+<strong>M-File List</strong><br/>
+<table cellspacing="0" cellpadding="2" border="0">
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FDataClasses%2Ffn2key.m'))" name="fn2key"><span class="mono">fn2key</span></a></td>
+<td class="td-linetopleft">
+<pre>fn2key converts fieldname to a key</pre>
+<pre>
+  fn2key converts fieldname to a key
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FDataClasses%2Ffn2num.m'))" name="fn2num"><span class="mono">fn2num</span></a></td>
+<td class="td-linetopleft">
+<pre>fn2num converts special field names to numbers</pre>
+<pre>
+  fn2num converts special field names to numbers
+  num = fn2num(fn)
+  fn is a string or cell of strings
+  num is a number or array of numbers
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FDataClasses%2Fkey2fn.m'))" name="key2fn"><span class="mono">key2fn</span></a></td>
+<td class="td-linetopleft">
+<pre>key2fn converts a key to a fieldname</pre>
+<pre>
+  key2fn converts a key to a fieldname
+<br/>
+</pre>
+</td></tr>
+<tr>
+<td valign="top" class="td-linetop"><a href="matlab: edit(urldecode('%2FUsers%2Fdoc%2FDoug%2FCompendia%2Ftrunk%2Fshare%2Fmatlab%2FDataClasses%2Fnum2fn.m'))" name="num2fn"><span class="mono">num2fn</span></a></td>
+<td class="td-linetopleft">
+<pre>num2fn converts numbers to valid structure fieldnames</pre>
+<pre>
+  num2fn converts numbers to valid structure fieldnames
+  fn = num2fn(num)
+  num is a number or array of numbers
+  fn is a string or cell of strings
+<br/>
+</pre>
+</td></tr>
+</table>
+</body></html>

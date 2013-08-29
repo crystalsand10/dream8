@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Labels</TITLE>
+<META NAME="description" CONTENT="The Labels">
+<META NAME="keywords" CONTENT="MatlabDataHandling">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="MatlabDataHandling.css">
+
+</HEAD>
+
+<BODY >
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html163"
+  HREF="Labels.html#SECTION00044100000000000000">Standard Labeling</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H2><A NAME="SECTION00044000000000000000">
+The Labels</A>
+</H2>
+Labels defines the Labels of the different dimensions of the data cubes. Typically, we define 5 different dimensions: the time, readout measured, and 3 other independent dimensions (e.g. Cell type, stimuli, and inhibitors).   Most cubes have the same dimension; as it is not  necessarily the case, each cube has its own dimensions to ensure  consistency.
+<PRE>
+Compendium.data(1).Labels=
+1x5 struct array with fields:
+    Names
+    Value
+</PRE>
+
+<P>
+Often, we use the so-called 'canonical form', with Time as the 2nd dimension and the Signals (or Measurements) as the 5th dimension, e.g.
+<PRE>
+Compendium.Labels.Names='CellTypes' 'Times' 'Cues' 
+                     'Inhibitors' 'Measurements'
+</PRE>
+
+<P>
+Many functions work only on this canonical form.
+
+<P>
+The labels for most dimensions are saved as strings, but time is stored as a numerical vector.
+
+<P>
+<PRE>
+Compendium.data(1).Labels(1).Value = 'HepG2' 'Primary'
+
+Compendium.data(1).Labels(2).Value =  0 30 180
+
+Compendium.data(1).Labels(3).Value = 'DMSO' 'FASL' 'IFNg' 'TNF'
+ 'IL1a' 'IL6' 'IGF1' 'TGFa' 'TGFb' 'HGF' 'LPS'
+
+Compendium.data(1).Labels(4).Value = 'DMSOi' 'MEK12i' 'p38i' 'PI3Ki' 
+'IKKabi' 'mTORi' 'GSK3i' 'JNK12i'
+
+Compendium.data(1).Labels(5).Value =  'AKT' 'ERK12' 'GSK3' 'Ikb' 
+'JNK12' 'p38' 'p70S6' 'p90RSK' 'STAT3' 'cJUN' 'CREB' 'HistH3' 
+'HSP27' 'IRS1s' 'MEK12' 'p53' 'STAT6'
+</PRE>
+
+<P>
+
+<H3><A NAME="SECTION00044100000000000000">
+Standard Labeling</A>
+</H3>
+While the framework of the pipeline is flexible, it is recommended to be consistent in the labeling of the dimensions. This avoid compatibility problems, e.g. if you call your data about ERK phosphophorylation p-ERK12 but in your Boolean model you call this state ERK.
+We use as standard the following names:
+<BR>
+<P>
+
+<B>Cytokines-</B>
+Either when they are cues or readouts, we use the following names, alphabetically ordered:
+<BR>
+'bNGF', 
+<BR>'CTACK',
+<BR>'DMSO',
+<BR>'Eotaxin',
+<BR> 'FASL', 'FGFbasic',
+<BR>'GCSF', 'GMCSF',  'GROa', 
+<BR>'HGF',
+<BR> 'ICAM1',  'IGF1', 'IFNg', 'IFNa2', 'IL1a', 'IL1b', 'IL1ra', 'IL2', 'IL2ra', 'IL3', 'IL4',
+ 'IL5', 'IL6', 'IL7', 'IL8', 'IL9', 'IL10', 'IL12p40', 'IL12p70', 'IL13', 'IL15', 'IL16', 'IL17', 'IL18',
+  'IP10',
+<BR> 'LIF', 'LPS', 
+<BR>'MCP1',  'MCP3', 'MCSF', 'MIF', 'MIG', 'MIP1a', 'MIP1b',
+<BR>'NOCYTO',
+<BR> 'PDGFbb',
+<BR>'RANTES',
+<BR>  'SCF', 'SCGFb', 'SDF1a',
+<BR>'TGFa', 'TGFb', 'TNFb', 'TNFa',  'TRAIL',
+<BR> 'VCAM1', 'VEGF'.
+<BR>
+<P>
+Note that both 'NOCYTO' and 'DMSO' are used to determine the absence of cytokine
+
+<BR>
+<P>
+
+<B>Phosphorylation readouts-</B>
+ 'AKT',
+<BR>'cJUN'  'CREB',
+<BR>'ERK12',
+<BR>'GSK3',
+<BR>'HistH3', 'HSP27',
+<BR> 'Ikb', 'IRS1s,'
+<BR>  'JNK12,'
+<BR> 'MEK12',  
+<BR> 'p38', 'p53', 'p70S6', 'p90RSK', 
+<BR>'STAT3', 'STAT6'.
+<BR>
+<P>
+
+<B>Inhibitors-</B>
+We use the syntax: 'Protein inhibited1' 'i' 'Protein inhibited2' 'i' '-free text'. Do not use - inside the free text. Use the free text particularly if you have different inhibitors for the same protein. 
+
+<P>
+E.g. PI3Ki-inh1, PI3Ki-inh2. If you have only one, you can call it PI3Ki.  
+
+<P>
+You can use the label 'NOINHIB' to define the absence of inhibitor.
+
+<P>
+<BR><HR>
+<ADDRESS>
+Julio Saez-Rodriguez & Arthur Goldsipe, 2007
+</ADDRESS>
+</BODY>
+</HTML>

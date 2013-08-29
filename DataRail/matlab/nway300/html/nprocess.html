@@ -1,0 +1,747 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>nprocess</title>
+      <meta name="generator" content="MATLAB 7.4">
+      <meta name="date" content="2007-02-28">
+      <meta name="m-file" content="nprocess"><style>
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content"><pre class="codeinput"><span class="keyword">function</span> [Xnew,mX,sX]=nprocess(X,Cent,Scal,mX,sX,reverse,show,usemse);
+
+<span class="comment">%NPROCESS pre and postprocessing of multiway arrays</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">% CENTERING AND SCALING OF N-WAY ARRAYS</span>
+<span class="comment">%</span>
+<span class="comment">% This m-file works in two ways</span>
+<span class="comment">%    I.  Calculate center and scale parameters and preprocess data</span>
+<span class="comment">%    II. Use given center and scale parameters for preprocessing data</span>
+<span class="comment">%</span>
+<span class="comment">% %%% I. Calculate center and scale parameters %%%</span>
+<span class="comment">%</span>
+<span class="comment">%     [Xnew,Means,Scales]=nprocess(X,Cent,Scal);</span>
+<span class="comment">%</span>
+<span class="comment">%     INPUT</span>
+<span class="comment">%     X       Data array</span>
+<span class="comment">%     Cent    is binary row vector with as many elements as DimX.</span>
+<span class="comment">%             If Cent(i)=1 the centering across the i'th mode is performed</span>
+<span class="comment">%             I.e cnt = [1 0 1] means centering across mode one and three.</span>
+<span class="comment">%     Scal    is defined likewise. Scal(i)=1, means scaling to standard</span>
+<span class="comment">%             deviation one within the i'th mode</span>
+<span class="comment">%</span>
+<span class="comment">%     OUTPUT</span>
+<span class="comment">%     Xnew    The preprocessed data</span>
+<span class="comment">%     mX      Sparse vector holding the mean-values</span>
+<span class="comment">%     sX      Sparse vector holding the scales</span>
+<span class="comment">%</span>
+<span class="comment">% %%% II. Use given center and scale parameters %%%</span>
+<span class="comment">%</span>
+<span class="comment">%     Xnew=nprocess(X,Cent,Scal,mX,sX,reverse);</span>
+<span class="comment">%</span>
+<span class="comment">%     INPUT</span>
+<span class="comment">%     X       Data array</span>
+<span class="comment">%     Cent    is binary row vector with as many elements as DimX.</span>
+<span class="comment">%             If Cent(i)=1 the centering across the i'th mode is performed</span>
+<span class="comment">%             I.e Cent = [1 0 1] means centering across mode one and three.</span>
+<span class="comment">%     Scal    is defined likewise. Scal(i)=1, means scaling to standard</span>
+<span class="comment">%             deviation one within the i'th mode</span>
+<span class="comment">%     mX      Sparse vector holding the mean-values</span>
+<span class="comment">%     sX      Sparse vector holding the scales</span>
+<span class="comment">%     reverse Optional input</span>
+<span class="comment">%             if reverse = 1 normal preprocessing is performed (default)</span>
+<span class="comment">%             if reverse = -1 inverse (post-)processing is performed</span>
+<span class="comment">%</span>
+<span class="comment">%     OUTPUT</span>
+<span class="comment">%     Xnew    The preprocessed data</span>
+<span class="comment">%</span>
+<span class="comment">% For convenience this m-file does not use iterative</span>
+<span class="comment">% preprocessing, which is necessary for some combinations of scaling</span>
+<span class="comment">% and centering. Instead the algorithm first standardizes the modes</span>
+<span class="comment">% successively and afterwards centers. The prior standardization ensures</span>
+<span class="comment">% that the individual variables are on similar scale (this might be slightly</span>
+<span class="comment">% disturbed upon centering - unlike for two-way data).</span>
+<span class="comment">%</span>
+<span class="comment">% The full I/O for nprocess is</span>
+<span class="comment">% [Xnew,mX,sX]=nprocess(X,Cent,Scal,mX,sX,reverse,show,usemse);</span>
+<span class="comment">% where show set to zero avoids screen output and where usemse set</span>
+<span class="comment">% to one uses RMSE instead of STD for scaling (more appropriate</span>
+<span class="comment">% in some settings)</span>
+
+<span class="comment">% Copyright, 1998 -</span>
+<span class="comment">% This M-file and the code in it belongs to the holder of the</span>
+<span class="comment">% copyrights and is made public under the following constraints:</span>
+<span class="comment">% It must not be changed or modified and code cannot be added.</span>
+<span class="comment">% The file must be regarded as read-only. Furthermore, the</span>
+<span class="comment">% code can not be made part of anything but the 'N-way Toolbox'.</span>
+<span class="comment">% In case of doubt, contact the holder of the copyrights.</span>
+<span class="comment">%</span>
+<span class="comment">% Rasmus Bro</span>
+<span class="comment">% Chemometrics Group, Food Technology</span>
+<span class="comment">% Department of Food and Dairy Science</span>
+<span class="comment">% Royal Veterinary and Agricultutal University</span>
+<span class="comment">% Rolighedsvej 30, DK-1958 Frederiksberg, Denmark</span>
+<span class="comment">% Phone  +45 35283296</span>
+<span class="comment">% Fax    +45 35283245</span>
+<span class="comment">% E-mail rb@kvl.dk</span>
+
+
+<span class="comment">% $ Version 1.03 $ Date 6. May 1998 $ Drastic error in finding scale parameters corrected $ Not compiled $</span>
+<span class="comment">% $ Version 1.031 $ Date 25. January 2000 $ Error in scaling part $ Not compiled $</span>
+<span class="comment">% $ Version 1.032 $ Date 28. January 2000 $ Minor bug$ Not compiled $</span>
+<span class="comment">% $ Version 1.033 $ Date 14. April 2001 $ Incorrect backscaling fixed.</span>
+<span class="comment">% $ Version 2.00 $ May 2001 $ Changed to array notation $ RB $ Not compiled $</span>
+<span class="comment">% $ Version 2.00 $ May 2001 $ rewritten by Giorgio Tomasi $ RB $ Not compiled $</span>
+<span class="comment">% $ Version 2.01 $ Feb 2002 $ Fixed errors occuring with one-slab inputs $ RB $ Not compiled $</span>
+<span class="comment">% $ Version 2.02 $ Oct 2003 $ Added possibility for sclaing with RMSE $ RB $ Not compiled $</span>
+
+
+<span class="comment">% $ Version 1.03 $ Date 6. May 1998 $ Drastic error in finding scale parameters corrected $ Not compiled $</span>
+
+<span class="comment">% Copyright (C) 1995-2006  Rasmus Bro &amp; Claus Andersson</span>
+<span class="comment">% Copenhagen University, DK-1958 Frederiksberg, Denmark, rb@life.ku.dk</span>
+<span class="comment">%</span>
+<span class="comment">% This program is free software; you can redistribute it and/or modify it under</span>
+<span class="comment">% the terms of the GNU General Public License as published by the Free Software</span>
+<span class="comment">% Foundation; either version 2 of the License, or (at your option) any later version.</span>
+<span class="comment">%</span>
+<span class="comment">% This program is distributed in the hope that it will be useful, but WITHOUT</span>
+<span class="comment">% ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS</span>
+<span class="comment">% FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.</span>
+<span class="comment">% You should have received a copy of the GNU General Public License along with</span>
+<span class="comment">% this program; if not, write to the Free Software Foundation, Inc., 51 Franklin</span>
+<span class="comment">% Street, Fifth Floor, Boston, MA  02110-1301, USA.</span>
+
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">% CENTERING AND SCALING OF N-WAY ARRAYS</span>
+<span class="comment">%</span>
+<span class="comment">% This m-file works in two ways</span>
+<span class="comment">%    I.  Calculate center and scale parameters and preprocess data</span>
+<span class="comment">%    II. Use given center and scale parameters for preprocessing data</span>
+<span class="comment">%</span>
+<span class="comment">% %%% I. Calculate center and scale parameters %%%</span>
+<span class="comment">%</span>
+<span class="comment">%     [Xnew,Means,Scales]=nprocess(X,DimX,Cent,Scal);</span>
+<span class="comment">%</span>
+<span class="comment">%     INPUT</span>
+<span class="comment">%     X       Data array</span>
+<span class="comment">%     DimX    Size of X</span>
+<span class="comment">%     Cent    is binary row vector with as many elements as DimX.</span>
+<span class="comment">%             If Cent(i)=1 the centering across the i'th mode is performed</span>
+<span class="comment">%             I.e cnt = [1 0 1] means centering across mode one and three.</span>
+<span class="comment">%     Scal    is defined likewise. Scal(i)=1, means scaling to standard</span>
+<span class="comment">%             deviation one within the i'th mode</span>
+<span class="comment">%</span>
+<span class="comment">%     OUTPUT</span>
+<span class="comment">%     Xnew    The preprocessed data</span>
+<span class="comment">%     mX      Sparse vector holding the mean-values</span>
+<span class="comment">%     sX      Sparse vector holding the scales</span>
+<span class="comment">%</span>
+<span class="comment">% %%% II. Use given center and scale parameters %%%</span>
+<span class="comment">%</span>
+<span class="comment">%     Xnew=nprocess(X,DimX,Cent,Scal,mX,sX);</span>
+<span class="comment">%</span>
+<span class="comment">%     INPUT</span>
+<span class="comment">%     X       Data array</span>
+<span class="comment">%     DimX    Size of X</span>
+<span class="comment">%     Cent    is binary row vector with as many elements as DimX.</span>
+<span class="comment">%             If Cent(i)=1 the centering across the i'th mode is performed</span>
+<span class="comment">%             I.e Cent = [1 0 1] means centering across mode one and three.</span>
+<span class="comment">%     Scal    is defined likewise. Scal(i)=1, means scaling to standard</span>
+<span class="comment">%             deviation one within the i'th mode</span>
+<span class="comment">%     mX      Sparse vector holding the mean-values</span>
+<span class="comment">%     sX      Sparse vector holding the scales</span>
+<span class="comment">%     reverse Optional input</span>
+<span class="comment">%             if reverse = 1 normal preprocessing is performed (default)</span>
+<span class="comment">%             if reverse = -1 inverse (post-)processing is performed</span>
+<span class="comment">%</span>
+<span class="comment">%     OUTPUT</span>
+<span class="comment">%     Xnew    The preprocessed data</span>
+<span class="comment">%</span>
+<span class="comment">% For convenience this m-file does not use iterative</span>
+<span class="comment">% preprocessing, which is necessary for some combinations of scaling</span>
+<span class="comment">% and centering. Instead the algorithm first standardizes the modes</span>
+<span class="comment">% successively and afterwards centers. The prior standardization ensures</span>
+<span class="comment">% that the individual variables are on similar scale (this might be slightly</span>
+<span class="comment">% disturbed upon centering - unlike for two-way data).</span>
+<span class="comment">%</span>
+<span class="comment">%	Copyright</span>
+<span class="comment">%	Rasmus Bro 1997</span>
+<span class="comment">%	Denmark</span>
+<span class="comment">%	E-mail rb@kvl.dk</span>
+ord  = ndims(X);
+DimX = size(X);
+Xnew = X;
+
+<span class="keyword">if</span> nargin&lt;3
+   error(<span class="string">' Three input arguments must be given'</span>)
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> nargin==4
+   error(<span class="string">' You must input both mX and sX even if you are only doing centering'</span>)
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> nargin&lt;8
+  usemse=0;
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> ~exist(<span class="string">'mX'</span>,<span class="string">'var'</span>)
+   mX = [];
+<span class="keyword">end</span>
+<span class="keyword">if</span> ~exist(<span class="string">'sX'</span>,<span class="string">'var'</span>)
+   sX = [];
+<span class="keyword">end</span>
+
+MODE = isa(mX,<span class="string">'cell'</span>)&amp;isa(sX,<span class="string">'cell'</span>);
+
+<span class="keyword">if</span> ~exist(<span class="string">'show'</span>)==1
+   show=1;
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> ~exist(<span class="string">'reverse'</span>)==1
+   reverse=1;
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> ~any([1 -1]==reverse)
+   error( <span class="string">'The input &lt;&lt;reverse&gt;&gt; must be one or minus one'</span>)
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> show~=-1
+   <span class="keyword">if</span> ~MODE
+      disp(<span class="string">' Calculating mean and scale and processing data'</span>)
+   <span class="keyword">else</span>
+      <span class="keyword">if</span> reverse==1
+         disp(<span class="string">' Using given mean and scale values for preprocessing data'</span>)
+      <span class="keyword">elseif</span> reverse==-1
+         disp(<span class="string">' Using given mean and scale values for postprocessing data'</span>)
+      <span class="keyword">end</span>
+   <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> i=1:ndims(X)
+   Inds{i} = ones(size(Xnew,i),1);
+<span class="keyword">end</span>
+Indm = repmat({<span class="string">':'</span>},ndims(Xnew) - 1,1);
+
+out=0;
+<span class="keyword">if</span> ~MODE
+   mX = cell(ord,1);
+   sX = cell(ord,1);
+<span class="keyword">end</span>
+Ord2Patch = [2,1;1,2];
+<span class="keyword">if</span> reverse == 1
+   <span class="comment">%Standardize</span>
+   <span class="keyword">for</span> j = ord:-1:1
+      o = [j 1:j-1 j+1:ord];
+      <span class="keyword">if</span> Scal(j)
+         <span class="keyword">if</span> show~=-1
+            disp([<span class="string">' Scaling mode '</span>,num2str(j)])
+         <span class="keyword">end</span>
+         <span class="keyword">if</span> ~MODE
+           <span class="keyword">if</span> ~usemse
+             sX{j} = (stdnan(nshape(Xnew,j)')').^-1;
+           <span class="keyword">else</span>
+             sX{j} = (rmsenan(nshape(Xnew,j)')').^-1;
+           <span class="keyword">end</span>
+         <span class="keyword">end</span>
+         Xnew = Xnew.*ipermute(sX{j}(:,Inds{o(2:end)}),o);
+      <span class="keyword">end</span>
+   <span class="keyword">end</span>
+   <span class="comment">%Center</span>
+   <span class="keyword">for</span> j = ord:-1:1
+      o = [1:j-1 j+1:ord,j];
+      <span class="keyword">if</span> Cent(j)
+         <span class="keyword">if</span> show~=-1
+            <span class="keyword">if</span> ~MODE
+               disp([<span class="string">' Centering mode '</span>,num2str(j)])
+            <span class="keyword">else</span>
+               disp([<span class="string">' Subtracting off-sets in mode '</span>,num2str(j)])
+            <span class="keyword">end</span>
+         <span class="keyword">end</span>
+         <span class="keyword">if</span> ~MODE
+            <span class="keyword">if</span> ord ~= 2
+               mmm = nshape(Xnew,j);
+               <span class="keyword">if</span> min(size(mmm))==1
+                  mmm = mmm;
+               <span class="keyword">else</span>
+                  mmm = missmean(mmm);
+               <span class="keyword">end</span>
+               mX{j} = reshape(mmm,DimX(o(1:end-1)));
+            <span class="keyword">else</span>
+               mX{j} = reshape(missmean(nshape(Xnew,j)),DimX(o(1)),1);
+            <span class="keyword">end</span>
+         <span class="keyword">end</span>
+         Xnew = Xnew - ipermute(mX{j}(Indm{:},Inds{j}),o);
+      <span class="keyword">end</span>
+   <span class="keyword">end</span>
+
+<span class="keyword">else</span>
+
+   <span class="comment">%Center</span>
+   <span class="keyword">for</span> j = 1:ord
+
+      <span class="keyword">if</span> Cent(j)
+         <span class="keyword">if</span> show~=-1
+            disp([<span class="string">' Adding off-sets in mode '</span>,num2str(j)])
+         <span class="keyword">end</span>
+         Xnew = Xnew + ipermute(mX{j}(Indm{:},Inds{j}),[1:j-1 j+1:ord,j]);
+      <span class="keyword">end</span>
+   <span class="keyword">end</span>
+   <span class="comment">%Standardize</span>
+   <span class="keyword">for</span> j = 1:ord
+      o = [1:j-1 j+1:ord];
+      <span class="keyword">if</span> Scal(j)
+         <span class="keyword">if</span> show~=-1
+            disp([<span class="string">' Rescaling back to original domain in mode '</span>,num2str(j)])
+         <span class="keyword">end</span>
+         Xnew = Xnew ./ ipermute(sX{j}(:,Inds{o}),[j o]);
+      <span class="keyword">end</span>
+   <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> st=rmsenan(X);
+
+<span class="comment">%RMSENAN estimate RMSE with NaN's</span>
+<span class="comment">%</span>
+<span class="comment">% Estimates the RMSE of each column of X</span>
+<span class="comment">% when there are NaN's in X.</span>
+<span class="comment">%</span>
+<span class="comment">% Columns with only NaN's get a standard deviation of zero</span>
+
+
+<span class="comment">% $ Version 1.02 $ Date 28. July 1998 $ Not compiled $</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright, 1998 -</span>
+<span class="comment">% This M-file and the code in it belongs to the holder of the</span>
+<span class="comment">% copyrights and is made public under the following constraints:</span>
+<span class="comment">% It must not be changed or modified and code cannot be added.</span>
+<span class="comment">% The file must be regarded as read-only. Furthermore, the</span>
+<span class="comment">% code can not be made part of anything but the 'N-way Toolbox'.</span>
+<span class="comment">% In case of doubt, contact the holder of the copyrights.</span>
+<span class="comment">%</span>
+<span class="comment">% Rasmus Bro</span>
+<span class="comment">% Chemometrics Group, Food Technology</span>
+<span class="comment">% Department of Food and Dairy Science</span>
+<span class="comment">% Royal Veterinary and Agricultutal University</span>
+<span class="comment">% Rolighedsvej 30, DK-1958 Frederiksberg, Denmark</span>
+<span class="comment">% E-mail: rb@kvl.dk</span>
+
+[I,J]=size(X);
+
+st=[];
+<span class="keyword">for</span> j=1:J
+  id=find(~isnan(X(:,j)));
+  <span class="keyword">if</span> length(id)
+    st=[st sqrt(mean(X(id,j).^2))];
+  <span class="keyword">else</span>
+    st=[st 0];
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><p class="footer"><br>
+            Published with MATLAB&reg; 7.4<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+function [Xnew,mX,sX]=nprocess(X,Cent,Scal,mX,sX,reverse,show,usemse);
+
+%NPROCESS pre and postprocessing of multiway arrays
+%
+%
+% CENTERING AND SCALING OF N-WAY ARRAYS
+%
+% This m-file works in two ways
+%    I.  Calculate center and scale parameters and preprocess data
+%    II. Use given center and scale parameters for preprocessing data
+% 
+% %%% I. Calculate center and scale parameters %%%
+% 
+%     [Xnew,Means,Scales]=nprocess(X,Cent,Scal);
+% 
+%     INPUT
+%     X       Data array
+%     Cent    is binary row vector with as many elements as DimX.
+%             If Cent(i)=1 the centering across the i'th mode is performed
+%             I.e cnt = [1 0 1] means centering across mode one and three.
+%     Scal    is defined likewise. Scal(i)=1, means scaling to standard  
+%             deviation one within the i'th mode
+% 
+%     OUTPUT
+%     Xnew    The preprocessed data
+%     mX      Sparse vector holding the mean-values 
+%     sX      Sparse vector holding the scales
+%
+% %%% II. Use given center and scale parameters %%%
+% 
+%     Xnew=nprocess(X,Cent,Scal,mX,sX,reverse);
+% 
+%     INPUT
+%     X       Data array
+%     Cent    is binary row vector with as many elements as DimX.
+%             If Cent(i)=1 the centering across the i'th mode is performed
+%             I.e Cent = [1 0 1] means centering across mode one and three.
+%     Scal    is defined likewise. Scal(i)=1, means scaling to standard  
+%             deviation one within the i'th mode
+%     mX      Sparse vector holding the mean-values 
+%     sX      Sparse vector holding the scales
+%     reverse Optional input
+%             if reverse = 1 normal preprocessing is performed (default)
+%             if reverse = -1 inverse (post-)processing is performed
+%
+%     OUTPUT
+%     Xnew    The preprocessed data
+%
+% For convenience this m-file does not use iterative 
+% preprocessing, which is necessary for some combinations of scaling
+% and centering. Instead the algorithm first standardizes the modes
+% successively and afterwards centers. The prior standardization ensures
+% that the individual variables are on similar scale (this might be slightly
+% disturbed upon centering - unlike for two-way data).
+%
+% The full I/O for nprocess is
+% [Xnew,mX,sX]=nprocess(X,Cent,Scal,mX,sX,reverse,show,usemse);
+% where show set to zero avoids screen output and where usemse set 
+% to one uses RMSE instead of STD for scaling (more appropriate 
+% in some settings)
+
+% Copyright, 1998 - 
+% This M-file and the code in it belongs to the holder of the
+% copyrights and is made public under the following constraints:
+% It must not be changed or modified and code cannot be added.
+% The file must be regarded as read-only. Furthermore, the
+% code can not be made part of anything but the 'N-way Toolbox'.
+% In case of doubt, contact the holder of the copyrights.
+%
+% Rasmus Bro
+% Chemometrics Group, Food Technology
+% Department of Food and Dairy Science
+% Royal Veterinary and Agricultutal University
+% Rolighedsvej 30, DK-1958 Frederiksberg, Denmark
+% Phone  +45 35283296
+% Fax    +45 35283245
+% E-mail rb@kvl.dk
+
+
+% $ Version 1.03 $ Date 6. May 1998 $ Drastic error in finding scale parameters corrected $ Not compiled $
+% $ Version 1.031 $ Date 25. January 2000 $ Error in scaling part $ Not compiled $
+% $ Version 1.032 $ Date 28. January 2000 $ Minor bug$ Not compiled $
+% $ Version 1.033 $ Date 14. April 2001 $ Incorrect backscaling fixed.
+% $ Version 2.00 $ May 2001 $ Changed to array notation $ RB $ Not compiled $
+% $ Version 2.00 $ May 2001 $ rewritten by Giorgio Tomasi $ RB $ Not compiled $
+% $ Version 2.01 $ Feb 2002 $ Fixed errors occuring with one-slab inputs $ RB $ Not compiled $
+% $ Version 2.02 $ Oct 2003 $ Added possibility for sclaing with RMSE $ RB $ Not compiled $
+
+
+% $ Version 1.03 $ Date 6. May 1998 $ Drastic error in finding scale parameters corrected $ Not compiled $
+
+% Copyright (C) 1995-2006  Rasmus Bro & Claus Andersson
+% Copenhagen University, DK-1958 Frederiksberg, Denmark, rb@life.ku.dk
+%
+% This program is free software; you can redistribute it and/or modify it under 
+% the terms of the GNU General Public License as published by the Free Software 
+% Foundation; either version 2 of the License, or (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful, but WITHOUT 
+% ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+% FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+% You should have received a copy of the GNU General Public License along with 
+% this program; if not, write to the Free Software Foundation, Inc., 51 Franklin 
+% Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+%
+%
+% CENTERING AND SCALING OF N-WAY ARRAYS
+%
+% This m-file works in two ways
+%    I.  Calculate center and scale parameters and preprocess data
+%    II. Use given center and scale parameters for preprocessing data
+% 
+% %%% I. Calculate center and scale parameters %%%
+% 
+%     [Xnew,Means,Scales]=nprocess(X,DimX,Cent,Scal);
+% 
+%     INPUT
+%     X       Data array
+%     DimX    Size of X
+%     Cent    is binary row vector with as many elements as DimX.
+%             If Cent(i)=1 the centering across the i'th mode is performed
+%             I.e cnt = [1 0 1] means centering across mode one and three.
+%     Scal    is defined likewise. Scal(i)=1, means scaling to standard  
+%             deviation one within the i'th mode
+% 
+%     OUTPUT
+%     Xnew    The preprocessed data
+%     mX      Sparse vector holding the mean-values 
+%     sX      Sparse vector holding the scales
+%
+% %%% II. Use given center and scale parameters %%%
+% 
+%     Xnew=nprocess(X,DimX,Cent,Scal,mX,sX);
+% 
+%     INPUT
+%     X       Data array
+%     DimX    Size of X
+%     Cent    is binary row vector with as many elements as DimX.
+%             If Cent(i)=1 the centering across the i'th mode is performed
+%             I.e Cent = [1 0 1] means centering across mode one and three.
+%     Scal    is defined likewise. Scal(i)=1, means scaling to standard  
+%             deviation one within the i'th mode
+%     mX      Sparse vector holding the mean-values 
+%     sX      Sparse vector holding the scales
+%     reverse Optional input
+%             if reverse = 1 normal preprocessing is performed (default)
+%             if reverse = -1 inverse (post-)processing is performed
+%
+%     OUTPUT
+%     Xnew    The preprocessed data
+%
+% For convenience this m-file does not use iterative 
+% preprocessing, which is necessary for some combinations of scaling
+% and centering. Instead the algorithm first standardizes the modes
+% successively and afterwards centers. The prior standardization ensures
+% that the individual variables are on similar scale (this might be slightly
+% disturbed upon centering - unlike for two-way data).
+%
+%	Copyright
+%	Rasmus Bro 1997
+%	Denmark
+%	E-mail rb@kvl.dk
+ord  = ndims(X);
+DimX = size(X);
+Xnew = X;
+
+if nargin<3
+   error(' Three input arguments must be given')
+end
+
+if nargin==4
+   error(' You must input both mX and sX even if you are only doing centering')
+end
+
+if nargin<8
+  usemse=0;
+end
+
+if ~exist('mX','var')
+   mX = [];
+end
+if ~exist('sX','var')
+   sX = [];
+end
+
+MODE = isa(mX,'cell')&isa(sX,'cell');
+
+if ~exist('show')==1
+   show=1;
+end
+
+if ~exist('reverse')==1
+   reverse=1;
+end
+
+if ~any([1 -1]==reverse)
+   error( 'The input <<reverse>> must be one or minus one')
+end
+
+if show~=-1
+   if ~MODE
+      disp(' Calculating mean and scale and processing data')
+   else
+      if reverse==1
+         disp(' Using given mean and scale values for preprocessing data')
+      elseif reverse==-1
+         disp(' Using given mean and scale values for postprocessing data')
+      end
+   end
+end
+
+for i=1:ndims(X)
+   Inds{i} = ones(size(Xnew,i),1);
+end
+Indm = repmat({':'},ndims(Xnew) - 1,1); 
+
+out=0;
+if ~MODE
+   mX = cell(ord,1);
+   sX = cell(ord,1);
+end
+Ord2Patch = [2,1;1,2];
+if reverse == 1
+   %Standardize
+   for j = ord:-1:1
+      o = [j 1:j-1 j+1:ord];
+      if Scal(j)
+         if show~=-1
+            disp([' Scaling mode ',num2str(j)])
+         end
+         if ~MODE
+           if ~usemse
+             sX{j} = (stdnan(nshape(Xnew,j)')').^-1;
+           else
+             sX{j} = (rmsenan(nshape(Xnew,j)')').^-1;
+           end
+         end
+         Xnew = Xnew.*ipermute(sX{j}(:,Inds{o(2:end)}),o);
+      end
+   end
+   %Center
+   for j = ord:-1:1
+      o = [1:j-1 j+1:ord,j];
+      if Cent(j)
+         if show~=-1
+            if ~MODE
+               disp([' Centering mode ',num2str(j)])
+            else
+               disp([' Subtracting off-sets in mode ',num2str(j)])
+            end
+         end
+         if ~MODE
+            if ord ~= 2
+               mmm = nshape(Xnew,j);
+               if min(size(mmm))==1
+                  mmm = mmm;
+               else
+                  mmm = missmean(mmm);
+               end
+               mX{j} = reshape(mmm,DimX(o(1:end-1)));
+            else
+               mX{j} = reshape(missmean(nshape(Xnew,j)),DimX(o(1)),1);
+            end
+         end
+         Xnew = Xnew - ipermute(mX{j}(Indm{:},Inds{j}),o);
+      end
+   end
+   
+else
+
+   %Center
+   for j = 1:ord
+      
+      if Cent(j)
+         if show~=-1
+            disp([' Adding off-sets in mode ',num2str(j)])
+         end
+         Xnew = Xnew + ipermute(mX{j}(Indm{:},Inds{j}),[1:j-1 j+1:ord,j]);
+      end
+   end
+   %Standardize
+   for j = 1:ord
+      o = [1:j-1 j+1:ord];
+      if Scal(j)
+         if show~=-1
+            disp([' Rescaling back to original domain in mode ',num2str(j)])
+         end
+         Xnew = Xnew ./ ipermute(sX{j}(:,Inds{o}),[j o]);
+      end
+   end
+   
+end
+
+function st=rmsenan(X);
+
+%RMSENAN estimate RMSE with NaN's
+%
+% Estimates the RMSE of each column of X
+% when there are NaN's in X.
+%
+% Columns with only NaN's get a standard deviation of zero
+
+
+% $ Version 1.02 $ Date 28. July 1998 $ Not compiled $
+% 
+%
+% Copyright, 1998 - 
+% This M-file and the code in it belongs to the holder of the
+% copyrights and is made public under the following constraints:
+% It must not be changed or modified and code cannot be added.
+% The file must be regarded as read-only. Furthermore, the
+% code can not be made part of anything but the 'N-way Toolbox'.
+% In case of doubt, contact the holder of the copyrights.
+%
+% Rasmus Bro
+% Chemometrics Group, Food Technology
+% Department of Food and Dairy Science
+% Royal Veterinary and Agricultutal University
+% Rolighedsvej 30, DK-1958 Frederiksberg, Denmark
+% E-mail: rb@kvl.dk
+
+[I,J]=size(X);
+
+st=[];
+for j=1:J
+  id=find(~isnan(X(:,j)));
+  if length(id)
+    st=[st sqrt(mean(X(id,j).^2))];
+  else
+    st=[st 0];
+  end
+end
+##### SOURCE END #####
+-->
+   </body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Cubes</TITLE>
+<META NAME="description" CONTENT="The Cubes">
+<META NAME="keywords" CONTENT="MatlabDataHandling">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="MatlabDataHandling.css">
+
+</HEAD>
+
+<BODY >
+
+<H2><A NAME="SECTION00043000000000000000">
+The Cubes</A>
+</H2>
+The key mathematical structure in our pipeline is a datacube.  <A NAME="tex2html8"
+  HREF="http://en.wikipedia.org/wiki/Data_cube">Data cube</A>
+is the word used in computer programming; the same object is know as <A NAME="tex2html9"
+  HREF="http://en.wikipedia.org/wiki/Tensor">tensor</A>
+in mathematics, 
+and <A NAME="tex2html10"
+  HREF="http://en.wikipedia.org/wiki/Hypercube">hypercube</A>
+in geometry.
+
+<P>
+Each Compendium contains an array of data cube structures. The first data cube in the array is normally obtained by importing experimental data stored in the MIDAS format. Subsequent cubes are normally obtained by applying some function (normalization, discretization, etc, see Section&nbsp;<A HREF="MATLAB_functions.html#SecFunctions">4</A>.) to a previous data cube.
+
+<P>
+Each cube (e.g. Compendium.data(1)) is a structure that contains the actual data (the Value field), a short Name field, a longer Info field,  the name of the cube from which it is derived (the SourceData field), the name of the function used to create the cube (the Code field), and a snapshot of the function for documentation and re-computing purposes, e.g.
+<PRE>
+ Compendium.data(2) =
+     Value:[5-D double]
+     Name:'BackgroundSubtracted'
+     Info:'Removed the experimental background error from Raw Data'
+     Code:[1x1 struct]
+     Parameters: [1x1 struct]
+     SourceData: 'Raw'
+</PRE>
+
+<P>
+The first cube is typically the raw data as it is imported from the MIDAS file. Accordingly, the raw data cube has as sourcedata the MIDAS file it was converted from:
+<PRE>
+Compendium.data(1)=
+         Value: [5-D double]
+          Name: 'Raw'
+          Info: 'Raw Data as it comes from Leo'
+          Code: [1x1 struct]
+    Parameters: [0x0 struct]
+    SourceData:  'MD-LGA-11111-CytoInh17phFI-BLK.csv'
+</PRE>
+
+<P>
+To summarize, we use the following terminology:
+
+<UL>
+<LI>Compendium structure is the whole Compendium, e.g.&nbsp;<TT>Data</TT>,
+</LI>
+<LI>Cube structure is all the information related to a data cube, e.g. <TT>Compendium.data(1)</TT> 
+</LI>
+<LI>Data cube is the actual numerical N-dimensional cube, <TT>Compendium.data(1).Value</TT>.
+</LI>
+</UL>
+
+<P>
+<BR><HR>
+<ADDRESS>
+Julio Saez-Rodriguez & Arthur Goldsipe, 2007
+</ADDRESS>
+</BODY>
+</HTML>
